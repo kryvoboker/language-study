@@ -1,7 +1,6 @@
 import type { TranslationRequestDto } from '#shared/types/translation'
 
 export const useTranslationWorkbench = () => {
-  const config = useRuntimeConfig()
   const sourceText = ref('')
   const sourceLanguage = ref('en')
   const targetLanguage = ref('uk')
@@ -13,24 +12,20 @@ export const useTranslationWorkbench = () => {
   let pollTimer: ReturnType<typeof setTimeout> | undefined
   let sequence = 0
 
-  const authHeaders = (): HeadersInit => {
-    const token = useCookie<string | null>('nl_access_token').value
-    return token ? { Authorization: `Bearer ${token}` } : {}
-  }
-
   const cancelCurrent = async () => {
     sequence += 1
     if (debounceTimer) clearTimeout(debounceTimer)
     if (pollTimer) clearTimeout(pollTimer)
-    const id = current.value?.id
-    if (!id || current.value?.status === 'completed' || current.value?.status === 'failed' || current.value?.status === 'cancelled') return
-    current.value = { ...current.value, status: 'cancelled' }
-    await $fetch(`${config.public.apiBase}/translation-requests/${id}`, { method: 'DELETE', headers: authHeaders() }).catch(() => undefined)
+    const currentRequest = current.value
+    const id = currentRequest?.id
+    if (!id || currentRequest.status === 'completed' || currentRequest.status === 'failed' || currentRequest.status === 'cancelled') return
+    current.value = { ...currentRequest, status: 'cancelled' }
+    await $fetch(`/api/v1/translation-requests/${id}`, { method: 'DELETE' }).catch(() => undefined)
   }
 
   const poll = async (id: string, runSequence: number) => {
     if (runSequence !== sequence) return
-    const result = await $fetch<TranslationRequestDto>(`${config.public.apiBase}/translation-requests/${id}`, { headers: authHeaders() })
+    const result = await $fetch<TranslationRequestDto>(`/api/v1/translation-requests/${id}`)
     if (runSequence !== sequence) return
     current.value = result
     if (result.status === 'queued' || result.status === 'processing') {
@@ -44,8 +39,8 @@ export const useTranslationWorkbench = () => {
     errorMessage.value = null
     const runSequence = ++sequence
     try {
-      const result = await $fetch<TranslationRequestDto>(`${config.public.apiBase}/translation-requests`, {
-        method: 'POST', headers: authHeaders(), body: { source_text: text, source_language: sourceLanguage.value, target_language: targetLanguage.value },
+      const result = await $fetch<TranslationRequestDto>('/api/v1/translation-requests', {
+        method: 'POST', body: { source_text: text, source_language: sourceLanguage.value, target_language: targetLanguage.value },
       })
       if (runSequence !== sequence) return
       current.value = result

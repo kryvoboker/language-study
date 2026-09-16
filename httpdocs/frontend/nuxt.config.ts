@@ -11,18 +11,13 @@ export default defineNuxtConfig({
             allowedHosts: ['dev.language-study.com']
         }
     },
-    // typescript:        {
-    //     strict:    true,
-    //     typeCheck: true,
-    //     tsConfig:  {
-    //         compilerOptions: {
-    //             noUncheckedIndexedAccess:   true,
-    //             exactOptionalPropertyTypes: true,
-    //         },
-    //     },
-    // },
+    typescript:        {
+        strict: true,
+        typeCheck: true,
+    },
     runtimeConfig:     {
         apiInternalBase: process.env.NUXT_API_INTERNAL_BASE ?? 'http://nginx/api/v1',
+        apiInternalOrigin: process.env.NUXT_API_INTERNAL_ORIGIN ?? 'http://nginx',
         public:          {
             apiBase:             process.env.NUXT_PUBLIC_API_BASE ?? '/api/v1',
             backendOrigin:       process.env.NUXT_PUBLIC_BACKEND_ORIGIN ?? 'http://localhost:8080',

@@ -14,6 +14,10 @@ const swapLanguages = () => {
   targetLanguage.value = source
   void schedule()
 }
+
+const copyTranslation = async () => {
+  if (current.value?.translation) await navigator.clipboard.writeText(current.value.translation)
+}
 </script>
 
 <template>
@@ -33,7 +37,7 @@ const swapLanguages = () => {
       </div>
 
       <div class="text-panel p-5 sm:p-7">
-        <div class="mb-4 flex items-center justify-between"><div><p class="text-xs font-semibold uppercase tracking-[0.18em] text-primary">{{ $t('translator.translation') }}</p><h2 class="mt-1 text-lg font-medium">{{ $t('translator.result') }}</h2></div><button v-if="current?.translation" type="button" class="btn btn-circle btn-text btn-sm" @click="navigator.clipboard.writeText(current.translation ?? '')"><span class="icon-[tabler--copy] size-4" /></button></div>
+        <div class="mb-4 flex items-center justify-between"><div><p class="text-xs font-semibold uppercase tracking-[0.18em] text-primary">{{ $t('translator.translation') }}</p><h2 class="mt-1 text-lg font-medium">{{ $t('translator.result') }}</h2></div><button v-if="current?.translation" type="button" class="btn btn-circle btn-text btn-sm" @click="copyTranslation"><span class="icon-[tabler--copy] size-4" /></button></div>
         <div v-if="isBusy" class="space-y-3 pt-3"><div class="skeleton h-6 w-11/12"/><div class="skeleton h-6 w-9/12"/><div class="skeleton h-6 w-10/12"/></div>
         <p v-else-if="current?.translation" class="whitespace-pre-wrap text-xl leading-relaxed">{{ current.translation }}</p>
         <div v-else class="grid h-64 place-items-center text-center text-base-content/35"><div><span class="icon-[tabler--text-recognition] mx-auto mb-3 size-8"/><p>{{ $t('translator.empty') }}</p></div></div>

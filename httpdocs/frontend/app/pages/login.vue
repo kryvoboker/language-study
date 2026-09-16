@@ -1,15 +1,13 @@
 <script setup lang="ts">
-const config = useRuntimeConfig()
 const email = ref('')
 const password = ref('')
 const errorMessage = ref('')
 const loading = ref(false)
-const social = (provider: string) => navigateTo(`${config.public.backendOrigin}/auth/social/${provider}`, { external: true })
+const social = (provider: string) => navigateTo(`/api/auth/social/${provider}`)
 const login = async () => {
   loading.value = true; errorMessage.value = ''
   try {
-    const response = await $fetch<{ access_token: string }>(`${config.public.apiBase}/auth/login`, { method: 'POST', body: { email: email.value, password: password.value } })
-    useCookie('nl_access_token', { sameSite: 'lax', secure: false, maxAge: 1200 }).value = response.access_token
+    await $fetch('/api/auth/login', { method: 'POST', body: { email: email.value, password: password.value } })
     await navigateTo('/')
   } catch { errorMessage.value = 'Unable to sign in. Check your credentials and email verification.' } finally { loading.value = false }
 }

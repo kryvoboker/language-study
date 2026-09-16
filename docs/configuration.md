@@ -13,6 +13,8 @@ Configuration is split between `httpdocs/backend/.env` and `httpdocs/frontend/.e
 | `APP_KEY` | Laravel encryption key | Generate with `php artisan key:generate` |
 | `APP_DEBUG` | Local debugging | `true` locally |
 | `APP_URL` | Backend public URL | `http://localhost:8080` |
+| `FRONTEND_URL` | Storefront URL used by verification/social redirects | `http://localhost:8080` |
+| `CORS_ALLOWED_ORIGINS` | Comma-separated browser origins | `http://localhost:8080,http://localhost:3000` |
 | `NEW_STORAGE_PATH` | External Laravel storage path | `/var/www/storage` |
 | `DB_CONNECTION` | Database driver | `mysql` |
 | `DB_HOST` / `DB_PORT` | Database address | `mariadb` / `3306` |
@@ -37,6 +39,7 @@ The complete list is in [`httpdocs/backend/.env.example`](../httpdocs/backend/.e
 | `NUXT_PUBLIC_BACKEND_ORIGIN` | Backend origin for auth redirects | `http://localhost:8080` |
 | `NUXT_PUBLIC_PASSPORT_CLIENT_ID` | Passport client identifier | Empty |
 | `NUXT_PUBLIC_PASSPORT_REDIRECT_URI` | OAuth callback URL | `http://localhost:8080/auth/callback` |
+| `NUXT_PUBLIC_PASSPORT_CLIENT_NAME` | Human-readable public client label | `NativeLens Storefront` |
 | `NUXT_API_INTERNAL_BASE` | Server-side API base URL | `http://nginx/api/v1` |
 
 See [`httpdocs/frontend/.env.example`](../httpdocs/frontend/.env.example) for the authoritative template.
@@ -51,6 +54,7 @@ Nuxt uses English as the default locale and supports English, Ukrainian, and Rus
 - Keep `APP_KEY`, Passport keys, and social/provider secrets out of client-exposed variables.
 - Store AI provider credentials through the encrypted backend setting.
 - Use production-specific URLs and disable `APP_DEBUG` outside local development.
+- Never put a Passport client secret in Nuxt variables; the browser client is intentionally public.
 
 ## See Also
 

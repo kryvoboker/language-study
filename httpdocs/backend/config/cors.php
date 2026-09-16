@@ -9,7 +9,7 @@ return [
     'allowed_methods' => ['*'],
 
     'allowed_origins' => array_filter(
-        array_map('trim', explode(',', (string) env('CORS_ALLOWED_ORIGINS', 'http://dev.qr-code.com'))),
+        array_map('trim', explode(',', (string) env('CORS_ALLOWED_ORIGINS', 'http://localhost:3000'))),
     ),
 
     'allowed_origins_patterns' => [],

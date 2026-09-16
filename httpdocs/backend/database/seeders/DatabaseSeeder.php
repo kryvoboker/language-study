@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace httpdocs\backend\database\seeders;
+namespace Database\Seeders;
 
 use App\Models\AiProviderSetting;
 use Illuminate\Database\Seeder;

@@ -7,6 +7,7 @@ namespace App\Providers;
 use App\Models\User;
 use Carbon\CarbonInterval;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Passport\Passport;
 
@@ -34,8 +35,16 @@ class AppServiceProvider extends ServiceProvider
     {
         require_once app_path('Supports/helpers.php');
 
+        URL::forceRootUrl((string) config('app.url'));
+        Passport::authorizationView('passport.authorize');
+
         Passport::tokensExpireIn(CarbonInterval::minutes(20));
         Passport::refreshTokensExpireIn(CarbonInterval::days(30));
+        Passport::tokensCan([
+            'profile' => 'Read the authenticated profile',
+            'translate' => 'Use translation features',
+        ]);
+        Passport::setDefaultScope(['profile']);
 
         Gate::before(static function (User $user): ?bool {
             return $user->hasRole('super_admin') ? true : null;
