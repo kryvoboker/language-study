@@ -1,0 +1,43 @@
+[← Authentication](authentication.md) · [Back to README](../README.md) · [Translation Lifecycle →](translation-lifecycle.md)
+
+# AI Providers
+
+## Provider contract
+
+Every provider implements `AiProviderContract`:
+
+```php
+start(TranslationPromptData $data): ProviderOperationData
+retrieve(string $operation_id): ProviderResultData
+cancel(string $operation_id): void
+```
+
+The contract models an asynchronous operation rather than exposing a vendor-specific SDK response to the rest of the application.
+
+## Provider resolution
+
+`AiProviderResolver` selects a provider in this order:
+
+1. the user's explicit override
+2. the global default provider
+3. the first enabled provider
+
+Only administrators may change global or per-user provider selection. Storefront users do not receive provider metadata in API resources.
+
+## OpenAI adapter
+
+The first adapter is `OpenAiProvider`. It uses the Responses API with `background: true` and structured JSON output. Provider credentials are stored through an encrypted Laravel cast. The background response ID is persisted so queue jobs can cancel and poll it.
+
+## Adding a provider
+
+1. Add a provider key to `AiProviderType`.
+2. Implement `AiProviderContract`.
+3. Register the adapter in `AiProviderManager`.
+4. Add provider-specific configuration fields to Filament.
+5. Add tests for normalization, cancellation, and error mapping.
+
+## See Also
+
+- [Translation Lifecycle](translation-lifecycle.md) — how jobs use the contract
+- [Architecture](architecture.md) — domain boundaries and data isolation
+- [Configuration](configuration.md) — runtime credentials and services

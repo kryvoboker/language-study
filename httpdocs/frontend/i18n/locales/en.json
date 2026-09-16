@@ -1,0 +1,45 @@
+{
+  "nav": {
+    "login": "Log in",
+    "signup": "Create account"
+  },
+  "hero": {
+    "badge": "Translate + learn in one pass",
+    "title": "Translate the meaning. Learn the language.",
+    "subtitle": "Get a clear translation, see what was wrong in your original text, and compare it with one version a native speaker would naturally write."
+  },
+  "translator": {
+    "source": "Source",
+    "write": "Write or paste text",
+    "placeholder": "Start writing… NativeLens waits until you pause.",
+    "privacyHint": "When you resume typing, the current AI operation is cancelled before a new one is started.",
+    "translate": "Translate now",
+    "translation": "Translation",
+    "result": "Meaning first",
+    "empty": "Your translation will appear here.",
+    "analyzing": "Analyzing language…",
+    "ready": "Ready"
+  },
+  "coach": {
+    "natural": "Natural native-like version",
+    "title": "Language coach",
+    "notes": "notes",
+    "corrected": "Corrected source",
+    "clean": "No meaningful language issues found."
+  },
+  "benefits": {
+    "private": "Provider details stay private",
+    "fast": "Debounced and cancellable",
+    "learn": "Corrections with explanations"
+  },
+  "auth": {
+    "welcome": "Welcome back",
+    "loginHint": "Continue through the secure Laravel OAuth flow.",
+    "continueWith": "Continue with",
+    "pkceHint": "The storefront is designed for Passport Authorization Code + PKCE.",
+    "create": "Create account"
+  },
+  "theme": {
+    "toggle": "Toggle light/dark theme"
+  }
+}

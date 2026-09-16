@@ -1,0 +1,153 @@
+openapi: 3.1.0
+info:
+  title: NativeLens API
+  version: 1.0.0
+  description: Storefront API for AI-assisted translation and language coaching.
+servers:
+  - url: /api/v1
+security:
+  - passport: []
+paths:
+  /me:
+    get:
+      summary: Current user
+      responses:
+        '200':
+          description: Authenticated user
+  /translation-requests:
+    post:
+      summary: Create translation request
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTranslationRequest'
+      responses:
+        '202':
+          description: Accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TranslationRequest'
+  /translation-requests/{translationRequest}:
+    parameters:
+      - name: translationRequest
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      summary: Get translation status/result
+      responses:
+        '200':
+          description: Translation request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TranslationRequest'
+    delete:
+      summary: Cancel translation request
+      responses:
+        '204':
+          description: Cancelled or already terminal
+  /auth/login:
+    post:
+      security: []
+      summary: Exchange local credentials for a Passport access token
+      responses:
+        '200': { description: Passport access token }
+  /auth/social/exchange:
+    post:
+      security: []
+      summary: Exchange a one-time social login ticket for a Passport access token
+      responses:
+        '200': { description: Passport access token }
+  /auth/register:
+    post:
+      security: []
+      summary: Register local user
+      responses:
+        '201': { description: Created }
+  /auth/forgot-password:
+    post:
+      security: []
+      summary: Send password reset link
+      responses:
+        '202': { description: Accepted }
+  /auth/reset-password:
+    post:
+      security: []
+      summary: Reset a user's password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [token, email, password, password_confirmation]
+              properties:
+                token: { type: string }
+                email: { type: string, format: email }
+                password: { type: string, minLength: 10, format: password }
+                password_confirmation: { type: string, format: password }
+      responses:
+        '200':
+          description: Password reset
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [message]
+                properties:
+                  message: { type: string }
+components:
+  securitySchemes:
+    passport:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: /oauth/authorize
+          tokenUrl: /oauth/token
+          scopes:
+            profile: Read own profile
+            translate: Create and manage own translations
+  schemas:
+    CreateTranslationRequest:
+      type: object
+      required: [source_text, source_language, target_language]
+      properties:
+        source_text:
+          type: string
+          minLength: 1
+          maxLength: 12000
+        source_language:
+          type: string
+          examples: [en]
+        target_language:
+          type: string
+          examples: [uk]
+    TranslationRequest:
+      type: object
+      required: [id, status]
+      properties:
+        id: { type: string, format: uuid }
+        status:
+          type: string
+          enum: [queued, processing, completed, failed, cancelled]
+        translation: { type: [string, 'null'] }
+        natural_version: { type: [string, 'null'] }
+        source_corrected: { type: [string, 'null'] }
+        issues:
+          type: array
+          items:
+            $ref: '#/components/schemas/LanguageIssue'
+    LanguageIssue:
+      type: object
+      properties:
+        type: { type: string }
+        original: { type: string }
+        correction: { type: string }
+        explanation: { type: string }
+        severity: { type: string, enum: [info, warning, error] }

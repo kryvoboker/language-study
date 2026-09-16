@@ -1,0 +1,35 @@
+@import "tailwindcss";
+@import "flyonui/variants.css";
+
+@plugin "flyonui" {
+  themes: light --default, black --prefersdark;
+}
+
+@plugin "@iconify/tailwind4";
+
+@source "../../../node_modules/flyonui/flyonui.js";
+
+/*html { background-color: var(--color-base-100); }*/
+body { min-width: 320px; }
+
+.theme-switch__to-light { display: none; }
+.theme-switch__to-dark { display: inline-block; }
+
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme]) .theme-switch__to-light { display: inline-block; }
+  html:not([data-theme]) .theme-switch__to-dark { display: none; }
+}
+
+html[data-theme="black"] .theme-switch__to-light { display: inline-block; }
+html[data-theme="black"] .theme-switch__to-dark { display: none; }
+html[data-theme="light"] .theme-switch__to-light { display: none; }
+html[data-theme="light"] .theme-switch__to-dark { display: inline-block; }
+
+.workspace-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+}
+@media (max-width: 1024px) { .workspace-grid { grid-template-columns: 1fr; } }
+
+.text-panel { min-height: 420px; }
+.issue-mark { text-decoration-line: underline; text-decoration-style: wavy; text-decoration-thickness: 1.5px; }

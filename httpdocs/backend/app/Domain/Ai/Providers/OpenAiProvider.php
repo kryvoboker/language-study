@@ -1,0 +1,103 @@
+<?php
+
+namespace httpdocs\backend\app\Domain\Ai\Providers;
+
+use httpdocs\backend\app\Domain\Ai\Contracts\AiProviderContract;
+use httpdocs\backend\app\Domain\Ai\Data\ProviderOperationData;
+use httpdocs\backend\app\Domain\Ai\Data\ProviderResultData;
+use httpdocs\backend\app\Domain\Translation\Data\TranslationPromptData;
+use httpdocs\backend\app\Models\AiProviderSetting;
+use OpenAI;
+
+final class OpenAiProvider implements AiProviderContract
+{
+    public function start(AiProviderSetting $setting, TranslationPromptData $data): ProviderOperationData
+    {
+        $configuration = $setting->configuration;
+        $client = OpenAI::client((string) $configuration['api_key']);
+
+        $response = $client->responses()->create([
+            'model' => (string) ($configuration['model'] ?? 'gpt-5.6'),
+            'background' => true,
+            'store' => true,
+            'instructions' => $this->instructions(),
+            'input' => [[
+                'role' => 'user',
+                'content' => [[
+                    'type' => 'input_text',
+                    'text' => json_encode([
+                        'source_language' => $data->source_language,
+                        'target_language' => $data->target_language,
+                        'text' => $data->text,
+                    ], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR),
+                ]],
+            ]],
+            'text' => [
+                'format' => [
+                    'type' => 'json_schema',
+                    'name' => 'language_review',
+                    'strict' => true,
+                    'schema' => $this->schema(),
+                ],
+            ],
+        ]);
+
+        return new ProviderOperationData($response->id, (string) $response->status);
+    }
+
+    public function retrieve(AiProviderSetting $setting, string $operation_id): ProviderResultData
+    {
+        $client = OpenAI::client((string) $setting->configuration['api_key']);
+        $response = $client->responses()->retrieve($operation_id);
+        $status = (string) $response->status;
+
+        if ($status !== 'completed') {
+            return new ProviderResultData($status, error: $response->error?->message ?? null);
+        }
+
+        $decoded = json_decode($response->outputText, true, flags: JSON_THROW_ON_ERROR);
+        return new ProviderResultData($status, $decoded);
+    }
+
+    public function cancel(AiProviderSetting $setting, string $operation_id): void
+    {
+        $client = OpenAI::client((string) $setting->configuration['api_key']);
+        $client->responses()->cancel($operation_id);
+    }
+
+    private function instructions(): string
+    {
+        return <<<'PROMPT'
+You are a translation engine and language coach. Return only schema-valid JSON.
+Translate faithfully into the requested target language. Independently evaluate the source text for grammar, spelling, punctuation and unnatural phrasing. Provide one corrected source version, one natural native-like target version, and concise educational issues. Do not invent errors. Preserve names, URLs, code, numbers and intended tone.
+PROMPT;
+    }
+
+    private function schema(): array
+    {
+        return [
+            'type' => 'object',
+            'additionalProperties' => false,
+            'required' => ['translation', 'source_corrected', 'natural_version', 'issues'],
+            'properties' => [
+                'translation' => ['type' => 'string'],
+                'source_corrected' => ['type' => 'string'],
+                'natural_version' => ['type' => 'string'],
+                'issues' => [
+                    'type' => 'array',
+                    'items' => [
+                        'type' => 'object', 'additionalProperties' => false,
+                        'required' => ['type', 'original', 'correction', 'explanation', 'severity'],
+                        'properties' => [
+                            'type' => ['type' => 'string'],
+                            'original' => ['type' => 'string'],
+                            'correction' => ['type' => 'string'],
+                            'explanation' => ['type' => 'string'],
+                            'severity' => ['type' => 'string', 'enum' => ['info', 'warning', 'error']],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+    }
+}
