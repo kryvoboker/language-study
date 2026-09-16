@@ -1,23 +1,39 @@
 <?php
 
-namespace httpdocs\backend\app\Providers;
+declare(strict_types=1);
 
-use httpdocs\backend\app\Models\User;
+namespace App\Providers;
+
+use App\Models\User;
 use Carbon\CarbonInterval;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Passport\Passport;
-use function App\Providers\env;
 
 class AppServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        $this->app->useStoragePath((string) env('APP_STORAGE_PATH', dirname(base_path(), 2).'/storage/backend'));
+        $new_storage_path = string_value(config('filesystems.new_storage_path'));
+
+        if ($new_storage_path) {
+            config([
+                // Override compiled views path
+                'view.compiled' => $new_storage_path . '/framework/views',
+                'debugbar.storage.path' => $new_storage_path . '/debugbar',
+                'logging.channels.single.path' => $new_storage_path . '/logs/laravel.log',
+                'logging.channels.daily.path' => $new_storage_path . '/logs/laravel.log',
+                'logging.channels.stack.path' => $new_storage_path . '/logs/laravel.log',
+            ]);
+        }
+
+        $this->app->useStoragePath((string) env('NEW_STORAGE_PATH'));
     }
 
     public function boot(): void
     {
+        require_once app_path('Supports/helpers.php');
+
         Passport::tokensExpireIn(CarbonInterval::minutes(20));
         Passport::refreshTokensExpireIn(CarbonInterval::days(30));
 

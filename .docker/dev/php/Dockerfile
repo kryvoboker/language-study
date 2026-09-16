@@ -34,6 +34,7 @@ RUN install-php-extensions \
     sockets \
     intl \
     bcmath \
+    pcntl \
   && rm -f /usr/local/bin/install-php-extensions
 
 RUN docker-php-ext-enable xdebug xhprof

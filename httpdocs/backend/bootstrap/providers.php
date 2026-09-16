@@ -1,6 +1,8 @@
 <?php
+
+declare(strict_types=1);
 return [
-	\httpdocs\backend\app\Providers\AppServiceProvider::class,
-	\httpdocs\backend\app\Providers\AiServiceProvider::class,
-	\httpdocs\backend\app\Providers\Filament\AdminPanelProvider::class,
+    \App\Providers\AppServiceProvider::class,
+    \App\Providers\AiServiceProvider::class,
+    \App\Providers\Filament\AdminPanelProvider::class,
 ];

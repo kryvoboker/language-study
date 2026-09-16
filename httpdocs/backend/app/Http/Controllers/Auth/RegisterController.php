@@ -1,15 +1,15 @@
 <?php
 
-namespace httpdocs\backend\app\Http\Controllers\Auth;
+declare(strict_types=1);
 
-use httpdocs\backend\app\Http\Controllers\Controller;
-use httpdocs\backend\app\Models\User;
+namespace App\Http\Controllers\Auth;
+
+use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use function App\Http\Controllers\Auth\event;
-use function App\Http\Controllers\Auth\response;
 
 class RegisterController extends Controller
 {

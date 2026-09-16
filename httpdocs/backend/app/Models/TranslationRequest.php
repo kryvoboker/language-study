@@ -1,9 +1,10 @@
 <?php
 
-namespace httpdocs\backend\app\Models;
+declare(strict_types=1);
 
-use httpdocs\backend\app\Enums\TranslationStatus;
-use httpdocs\backend\app\Models\User;
+namespace App\Models;
+
+use App\Enums\TranslationStatus;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 

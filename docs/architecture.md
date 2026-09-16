@@ -53,7 +53,7 @@ This keeps PHP-FPM requests short-lived, allows independent queue scaling, and a
 
 ## Storage and isolation
 
-Laravel storage is mounted outside `httpdocs/backend` and configured in `bootstrap/app.php` and `AppServiceProvider`. `APP_STORAGE_PATH` controls the location.
+Laravel storage is mounted outside `httpdocs/backend` and configured in `bootstrap/app.php` and `AppServiceProvider`. `NEW_STORAGE_PATH` controls the location.
 
 Storefront resources intentionally exclude provider names, models, API keys, and provider IDs. Those values remain server-side for observability and billing.
 

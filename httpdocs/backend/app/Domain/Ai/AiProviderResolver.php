@@ -1,9 +1,11 @@
 <?php
 
-namespace httpdocs\backend\app\Domain\Ai;
+declare(strict_types=1);
 
-use httpdocs\backend\app\Models\AiProviderSetting;
-use httpdocs\backend\app\Models\User;
+namespace App\Domain\Ai;
+
+use App\Models\AiProviderSetting;
+use App\Models\User;
 use RuntimeException;
 
 final class AiProviderResolver

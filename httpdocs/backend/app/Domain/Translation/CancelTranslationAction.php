@@ -1,18 +1,20 @@
 <?php
 
-namespace httpdocs\backend\app\Domain\Translation;
+declare(strict_types=1);
 
-use httpdocs\backend\app\Domain\Ai\AiProviderManager;
-use httpdocs\backend\app\Enums\TranslationStatus;
-use httpdocs\backend\app\Models\AiProviderSetting;
-use httpdocs\backend\app\Models\TranslationRequest;
+namespace App\Domain\Translation;
+
+use App\Domain\Ai\AiProviderManager;
+use App\Enums\TranslationStatus;
+use App\Models\AiProviderSetting;
+use App\Models\TranslationRequest;
 use Throwable;
-use function App\Domain\Translation\now;
-use function App\Domain\Translation\report;
 
 final class CancelTranslationAction
 {
-    public function __construct(private AiProviderManager $manager) {}
+    public function __construct(private AiProviderManager $manager)
+    {
+    }
 
     public function execute(TranslationRequest $request): void
     {

@@ -1,19 +1,18 @@
 <?php
 
-namespace httpdocs\backend\app\Http\Controllers\Api\V1;
+declare(strict_types=1);
 
-use httpdocs\backend\app\Domain\Translation\CancelTranslationAction;
-use httpdocs\backend\app\Enums\TranslationStatus;
-use httpdocs\backend\app\Http\Controllers\Controller;
-use httpdocs\backend\app\Http\Requests\StoreTranslationRequest;
-use httpdocs\backend\app\Jobs\StartTranslationJob;
-use httpdocs\backend\app\Models\TranslationRequest;
+namespace App\Http\Controllers\Api\V1;
+
+use App\Domain\Translation\CancelTranslationAction;
+use App\Enums\TranslationStatus;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreTranslationRequest;
+use App\Jobs\StartTranslationJob;
+use App\Models\TranslationRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
-use function App\Http\Controllers\Api\V1\abort_unless;
-use function App\Http\Controllers\Api\V1\data_get;
-use function App\Http\Controllers\Api\V1\response;
 
 class TranslationRequestController extends Controller
 {

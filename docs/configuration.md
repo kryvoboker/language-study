@@ -13,7 +13,7 @@ Configuration is split between `httpdocs/backend/.env` and `httpdocs/frontend/.e
 | `APP_KEY` | Laravel encryption key | Generate with `php artisan key:generate` |
 | `APP_DEBUG` | Local debugging | `true` locally |
 | `APP_URL` | Backend public URL | `http://localhost:8080` |
-| `APP_STORAGE_PATH` | External Laravel storage path | `/var/webroot/storage/backend` |
+| `NEW_STORAGE_PATH` | External Laravel storage path | `/var/www/storage` |
 | `DB_CONNECTION` | Database driver | `mysql` |
 | `DB_HOST` / `DB_PORT` | Database address | `mariadb` / `3306` |
 | `DB_DATABASE` | Database name | `nativelens` |

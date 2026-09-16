@@ -1,14 +1,18 @@
 <?php
 
-namespace httpdocs\backend\app\Domain\Ai;
+declare(strict_types=1);
 
-use httpdocs\backend\app\Domain\Ai\Contracts\AiProviderContract;
+namespace App\Domain\Ai;
+
+use App\Domain\Ai\Contracts\AiProviderContract;
 use InvalidArgumentException;
 
 final class AiProviderManager
 {
     /** @param array<string, AiProviderContract> $providers */
-    public function __construct(private array $providers) {}
+    public function __construct(private array $providers)
+    {
+    }
 
     public function driver(string $key): AiProviderContract
     {

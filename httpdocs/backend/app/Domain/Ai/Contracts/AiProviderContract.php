@@ -1,11 +1,13 @@
 <?php
 
-namespace httpdocs\backend\app\Domain\Ai\Contracts;
+declare(strict_types=1);
 
-use httpdocs\backend\app\Domain\Ai\Data\ProviderOperationData;
-use httpdocs\backend\app\Domain\Ai\Data\ProviderResultData;
-use httpdocs\backend\app\Domain\Translation\Data\TranslationPromptData;
-use httpdocs\backend\app\Models\AiProviderSetting;
+namespace App\Domain\Ai\Contracts;
+
+use App\Domain\Ai\Data\ProviderOperationData;
+use App\Domain\Ai\Data\ProviderResultData;
+use App\Domain\Translation\Data\TranslationPromptData;
+use App\Models\AiProviderSetting;
 
 interface AiProviderContract
 {

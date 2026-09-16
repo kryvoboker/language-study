@@ -1,12 +1,14 @@
 <?php
 
-namespace httpdocs\backend\app\Domain\Ai\Providers;
+declare(strict_types=1);
 
-use httpdocs\backend\app\Domain\Ai\Contracts\AiProviderContract;
-use httpdocs\backend\app\Domain\Ai\Data\ProviderOperationData;
-use httpdocs\backend\app\Domain\Ai\Data\ProviderResultData;
-use httpdocs\backend\app\Domain\Translation\Data\TranslationPromptData;
-use httpdocs\backend\app\Models\AiProviderSetting;
+namespace App\Domain\Ai\Providers;
+
+use App\Domain\Ai\Contracts\AiProviderContract;
+use App\Domain\Ai\Data\ProviderOperationData;
+use App\Domain\Ai\Data\ProviderResultData;
+use App\Domain\Translation\Data\TranslationPromptData;
+use App\Models\AiProviderSetting;
 use OpenAI;
 
 final class OpenAiProvider implements AiProviderContract

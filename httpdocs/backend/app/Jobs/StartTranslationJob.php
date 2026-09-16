@@ -1,17 +1,17 @@
 <?php
 
-namespace httpdocs\backend\app\Jobs;
+declare(strict_types=1);
 
-use httpdocs\backend\app\Domain\Ai\AiProviderManager;
-use httpdocs\backend\app\Domain\Ai\AiProviderResolver;
-use httpdocs\backend\app\Domain\Translation\Data\TranslationPromptData;
-use httpdocs\backend\app\Enums\TranslationStatus;
-use httpdocs\backend\app\Jobs\PollTranslationJob;
-use httpdocs\backend\app\Models\TranslationRequest;
+namespace App\Jobs;
+
+use App\Domain\Ai\AiProviderManager;
+use App\Domain\Ai\AiProviderResolver;
+use App\Domain\Translation\Data\TranslationPromptData;
+use App\Enums\TranslationStatus;
+use App\Models\TranslationRequest;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Throwable;
-use function App\Jobs\now;
 
 class StartTranslationJob implements ShouldQueue
 {

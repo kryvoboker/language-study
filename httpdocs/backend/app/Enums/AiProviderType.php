@@ -1,6 +1,8 @@
 <?php
 
-namespace httpdocs\backend\app\Enums;
+declare(strict_types=1);
+
+namespace App\Enums;
 
 enum AiProviderType: string
 {

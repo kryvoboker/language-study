@@ -1,10 +1,13 @@
 <?php
-namespace httpdocs\backend\app\Http\Controllers\Auth;
-use httpdocs\backend\app\Http\Controllers\Controller;
+
+declare(strict_types=1);
+
+namespace App\Http\Controllers\Auth;
+
+use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Password;
-use function App\Http\Controllers\Auth\response;
 
 class ForgotPasswordController extends Controller
 {

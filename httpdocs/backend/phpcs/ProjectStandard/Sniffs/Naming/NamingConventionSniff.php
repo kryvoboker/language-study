@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace httpdocs\backend\phpcs\ProjectStandard\Sniffs\Naming;
 
-use httpdocs\backend\phpcs\ProjectStandard\Sniffs\Naming\File;
 use PHP_CodeSniffer\Sniffs\Sniff;
+
 use const ProjectStandard\Sniffs\Naming\T_EQUAL;
 
 // PHPCS uses global token constants and its own runtime classes.

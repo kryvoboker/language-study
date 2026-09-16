@@ -1,3 +1,9 @@
 <?php
-namespace httpdocs\backend\app\Http\Controllers;
-abstract class Controller {}
+
+declare(strict_types=1);
+
+namespace App\Http\Controllers;
+
+abstract class Controller
+{
+}

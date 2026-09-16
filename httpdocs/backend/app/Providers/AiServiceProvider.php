@@ -1,9 +1,11 @@
 <?php
 
-namespace httpdocs\backend\app\Providers;
+declare(strict_types=1);
 
-use httpdocs\backend\app\Domain\Ai\AiProviderManager;
-use httpdocs\backend\app\Domain\Ai\Providers\OpenAiProvider;
+namespace App\Providers;
+
+use App\Domain\Ai\AiProviderManager;
+use App\Domain\Ai\Providers\OpenAiProvider;
 use Illuminate\Support\ServiceProvider;
 
 class AiServiceProvider extends ServiceProvider

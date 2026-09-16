@@ -1,12 +1,16 @@
 <?php
-use httpdocs\backend\app\Http\Controllers\Api\V1\MeController;
-use httpdocs\backend\app\Http\Controllers\Api\V1\TranslationRequestController;
-use httpdocs\backend\app\Http\Controllers\Auth\ForgotPasswordController;
-use httpdocs\backend\app\Http\Controllers\Auth\LoginController;
-use httpdocs\backend\app\Http\Controllers\Auth\RegisterController;
-use httpdocs\backend\app\Http\Controllers\Auth\ResetPasswordController;
-use httpdocs\backend\app\Http\Controllers\Auth\SocialExchangeController;
+
+declare(strict_types=1);
+
+use App\Http\Controllers\Api\V1\MeController;
+use App\Http\Controllers\Api\V1\TranslationRequestController;
+use App\Http\Controllers\Auth\ForgotPasswordController;
+use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Auth\ResetPasswordController;
+use App\Http\Controllers\Auth\SocialExchangeController;
 use Illuminate\Support\Facades\Route;
+
 Route::prefix('v1')->group(function (): void {
     Route::post('/auth/register', RegisterController::class)->middleware('throttle:10,1');
     Route::post('/auth/login', LoginController::class)->middleware('throttle:10,1');

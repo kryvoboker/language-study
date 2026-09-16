@@ -1,9 +1,14 @@
 <?php
+
+declare(strict_types=1);
+
 namespace httpdocs\backend\database\seeders;
-use httpdocs\backend\app\Models\AiProviderSetting;
+
+use App\Models\AiProviderSetting;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
+
 class DatabaseSeeder extends Seeder
 {
     public function run(): void
