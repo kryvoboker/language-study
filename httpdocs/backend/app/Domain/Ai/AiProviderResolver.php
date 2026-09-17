@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Domain\Ai;
 
 use App\Models\AiProviderSetting;
-use App\Models\User;
+use App\Models\Users\User;
 use RuntimeException;
 
 final class AiProviderResolver

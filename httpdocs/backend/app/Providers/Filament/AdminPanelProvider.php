@@ -4,16 +4,27 @@ declare(strict_types=1);
 
 namespace App\Providers\Filament;
 
+use App\Filament\Navigation\AdminNavigationGroupEnum;
+use App\Filament\Pages\Wiki\ApplicationCurrenciesWikiPage;
+use App\Filament\Pages\Wiki\CatalogProductsWikiPage;
+use App\Filament\Pages\Wiki\CategoryPageSettingsWikiPage;
+use App\Filament\Pages\Wiki\InfoPagesWikiPage;
+use App\Filament\Pages\Wiki\ModulesWikiPage;
+use App\Filament\Pages\Wiki\UsersWikiPage;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Navigation\NavigationItem;
 use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
 use Filament\Support\Enums\Width;
+use Filament\Support\Icons\Heroicon;
+use Filament\Widgets\AccountWidget;
+use Filament\Widgets\FilamentInfoWidget;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -35,18 +46,31 @@ class AdminPanelProvider extends PanelProvider
 			])
 			->maxContentWidth(Width::Full)
 			->viteTheme('resources/assets/filament/css/admin/theme.css')
+			->plugins([
+				FilamentShieldPlugin::make()
+					->navigationSort(99)
+					->navigationGroup(AdminNavigationGroupEnum::Users),
+			])
 			// Show group menu list if user visited page from group
 			->collapsibleNavigationGroups()
 			// Show group menu list if user visited page from group
 			->sidebarCollapsibleOnDesktop()
 			->passwordReset()
 			->emailVerification()
+			->navigationGroups([
+				AdminNavigationGroupEnum::Users->getLabel(),
+				AdminNavigationGroupEnum::AiProviders->getLabel(),
+			])
 			->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
 			->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
 			->pages([
 				Dashboard::class,
 			])
-			->plugin(FilamentShieldPlugin::make())
+			->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
+			->widgets([
+				AccountWidget::class,
+				FilamentInfoWidget::class,
+			])
 			->middleware([
 				EncryptCookies::class,
 				AddQueuedCookiesToResponse::class,

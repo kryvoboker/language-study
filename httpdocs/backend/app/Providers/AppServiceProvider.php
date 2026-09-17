@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
-use App\Models\User;
+use App\Models\Users\User;
 use Carbon\CarbonInterval;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\URL;
