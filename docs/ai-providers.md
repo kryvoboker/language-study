@@ -28,6 +28,18 @@ Only administrators may change global or per-user provider selection. Storefront
 
 The first adapter is `OpenAiProvider`. It uses the Responses API with `background: true` and structured JSON output. Provider credentials are stored through an encrypted Laravel cast. The background response ID is persisted so queue jobs can cancel and poll it.
 
+## Configure a provider in Filament
+
+Administrators can add or edit provider settings at `/admin/ai-providers/ai-provider-settings`. Use the **Create** action to add a provider and enter:
+
+- `key`: the registered adapter key, such as `openai`
+- `name`: the display name
+- `enabled`: whether the provider may receive translation jobs
+- `is_default`: whether it is the global default provider
+- `configuration`: provider-specific values, such as `api_key` and `model` for OpenAI
+
+The `configuration` value is encrypted at rest. API keys must be entered only in Filament and must not be put into frontend environment variables. Only one provider is kept as the global default; a user's provider override takes precedence when it is enabled.
+
 ## Adding a provider
 
 1. Add a provider key to `AiProviderType`.

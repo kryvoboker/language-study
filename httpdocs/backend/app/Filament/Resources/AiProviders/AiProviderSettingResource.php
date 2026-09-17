@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources\AiProviders;
 
 use App\Filament\Navigation\AdminNavigationGroupEnum;
+use App\Filament\Resources\AiProviders\Pages\CreateAiProviderSetting;
 use App\Filament\Resources\AiProviders\Pages\EditAiProviderSetting;
 use App\Filament\Resources\AiProviders\Pages\ListAiProviderSettings;
 use App\Models\AiProviderSetting;
@@ -31,7 +32,12 @@ class AiProviderSettingResource extends Resource
 	{
 		return $schema->components([
 			TextInput::make('name')->required(),
-			TextInput::make('key')->disabled()->dehydrated(),
+			TextInput::make('key')
+				->required()
+				->alphaDash()
+				->unique(ignoreRecord: true)
+				->disabledOn('edit')
+				->dehydrated(),
 			Toggle::make('enabled'),
 			Toggle::make('is_default'),
 			KeyValue::make('configuration')
@@ -57,6 +63,7 @@ class AiProviderSettingResource extends Resource
 	{
 		return [
 			'index' => ListAiProviderSettings::route('/'),
+			'create' => CreateAiProviderSetting::route('/create'),
 			'edit'  => EditAiProviderSetting::route('/{record}/edit'),
 		];
 	}

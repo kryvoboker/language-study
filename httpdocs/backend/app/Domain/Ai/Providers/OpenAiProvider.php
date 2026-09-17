@@ -9,17 +9,18 @@ use App\Domain\Ai\Data\ProviderOperationData;
 use App\Domain\Ai\Data\ProviderResultData;
 use App\Domain\Translation\Data\TranslationPromptData;
 use App\Models\AiProviderSetting;
+use InvalidArgumentException;
 use OpenAI;
 
 final class OpenAiProvider implements AiProviderContract
 {
     public function start(AiProviderSetting $setting, TranslationPromptData $data): ProviderOperationData
     {
-        $configuration = $setting->configuration;
-        $client = OpenAI::client((string) $configuration['api_key']);
+        $configuration = $this->configuration($setting);
+        $client = OpenAI::client($configuration['api_key']);
 
         $response = $client->responses()->create([
-            'model' => (string) ($configuration['model'] ?? 'gpt-5.6'),
+            'model' => $configuration['model'],
             'background' => true,
             'store' => true,
             'instructions' => $this->instructions(),
@@ -49,7 +50,7 @@ final class OpenAiProvider implements AiProviderContract
 
     public function retrieve(AiProviderSetting $setting, string $operation_id): ProviderResultData
     {
-        $client = OpenAI::client((string) $setting->configuration['api_key']);
+        $client = OpenAI::client($this->configuration($setting)['api_key']);
         $response = $client->responses()->retrieve($operation_id);
         $status = (string) $response->status;
 
@@ -63,8 +64,26 @@ final class OpenAiProvider implements AiProviderContract
 
     public function cancel(AiProviderSetting $setting, string $operation_id): void
     {
-        $client = OpenAI::client((string) $setting->configuration['api_key']);
+        $client = OpenAI::client($this->configuration($setting)['api_key']);
         $client->responses()->cancel($operation_id);
+    }
+
+    /** @return array{api_key: string, model: string} */
+    private function configuration(AiProviderSetting $setting): array
+    {
+        $configuration = $setting->configuration ?? [];
+        $apiKey = $configuration['api_key'] ?? null;
+
+        if (! is_string($apiKey) || trim($apiKey) === '') {
+            throw new InvalidArgumentException("AI provider [{$setting->key}] has no API key configured.");
+        }
+
+        $model = $configuration['model'] ?? 'gpt-5.6';
+
+        return [
+            'api_key' => $apiKey,
+            'model' => is_string($model) && trim($model) !== '' ? $model : 'gpt-5.6',
+        ];
     }
 
     private function instructions(): string

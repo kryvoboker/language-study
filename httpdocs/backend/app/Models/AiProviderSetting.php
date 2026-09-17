@@ -10,6 +10,18 @@ class AiProviderSetting extends Model
 {
     protected $fillable = ['key', 'name', 'enabled', 'is_default', 'configuration'];
 
+    protected static function booted(): void
+    {
+        static::saving(function (self $setting): void {
+            if ($setting->is_default) {
+                self::query()
+                    ->whereKeyNot($setting->getKey())
+                    ->where('is_default', true)
+                    ->update(['is_default' => false]);
+            }
+        });
+    }
+
     protected function casts(): array
     {
         return ['enabled' => 'boolean', 'is_default' => 'boolean', 'configuration' => 'encrypted:array'];
