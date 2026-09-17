@@ -23,7 +23,7 @@ final class OpenAiProvider implements AiProviderContract
             'model' => $configuration['model'],
             'background' => true,
             'store' => true,
-            'instructions' => $this->instructions(),
+            'instructions' => $this->instructions($setting),
             'input' => [[
                 'role' => 'user',
                 'content' => [[
@@ -86,8 +86,12 @@ final class OpenAiProvider implements AiProviderContract
         ];
     }
 
-    private function instructions(): string
+    private function instructions(AiProviderSetting $setting): string
     {
+        if (is_string($setting->prompt_instruction) && trim($setting->prompt_instruction) !== '') {
+            return $setting->prompt_instruction;
+        }
+
         return <<<'PROMPT'
 You are a translation engine and language coach. Return only schema-valid JSON.
 Translate faithfully into the requested target language. Independently evaluate the source text for grammar, spelling, punctuation and unnatural phrasing. Provide one corrected source version, one natural native-like target version, and concise educational issues. Do not invent errors. Preserve names, URLs, code, numbers and intended tone.

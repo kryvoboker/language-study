@@ -16,6 +16,8 @@ final class AiProviderManager
 
     public function driver(string $key): AiProviderContract
     {
-        return $this->providers[$key] ?? throw new InvalidArgumentException("AI provider [{$key}] is not registered.");
+        $normalizedKey = strtolower(trim($key));
+
+        return $this->providers[$normalizedKey] ?? throw new InvalidArgumentException("AI provider [$key] is not registered.");
     }
 }

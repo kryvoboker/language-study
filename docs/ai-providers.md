@@ -34,11 +34,16 @@ Administrators can add or edit provider settings at `/admin/ai-providers/ai-prov
 
 - `key`: the registered adapter key, such as `openai`
 - `name`: the display name
+- `prompt_instruction`: the instruction sent to this AI assistant for translation requests. It replaces the default system prompt for this provider.
 - `enabled`: whether the provider may receive translation jobs
 - `is_default`: whether it is the global default provider
 - `configuration`: provider-specific values, such as `api_key` and `model` for OpenAI
 
 The `configuration` value is encrypted at rest. API keys must be entered only in Filament and must not be put into frontend environment variables. Only one provider is kept as the global default; a user's provider override takes precedence when it is enabled.
+
+Provider keys are matched case-insensitively and with surrounding whitespace ignored. Use the canonical key `openai` for the OpenAI adapter.
+
+The prompt instruction is stored per provider setting, so different assistants can use different translation and language-coaching behavior. Existing settings without an instruction continue to use the built-in compatibility instruction until they are edited.
 
 ## Adding a provider
 

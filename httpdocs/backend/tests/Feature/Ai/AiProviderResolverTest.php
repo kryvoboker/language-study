@@ -34,12 +34,18 @@ class AiProviderResolverTest extends TestCase
         $this->assertInstanceOf(OpenAiProvider::class, app(AiProviderManager::class)->driver('openai'));
     }
 
-    /** @return array{key: string, name: string, enabled: bool, is_default: bool, configuration: array{api_key: string, model: string}} */
+    public function test_manager_resolves_provider_keys_without_case_or_whitespace_sensitivity(): void
+    {
+        $this->assertInstanceOf(OpenAiProvider::class, app(AiProviderManager::class)->driver(' OpenAi '));
+    }
+
+    /** @return array{key: string, name: string, prompt_instruction: string, enabled: bool, is_default: bool, configuration: array{api_key: string, model: string}} */
     private function configuration(string $key, bool $isDefault): array
     {
         return [
             'key' => $key,
             'name' => ucfirst($key),
+            'prompt_instruction' => 'Translate the text and return the configured JSON response.',
             'enabled' => true,
             'is_default' => $isDefault,
             'configuration' => ['api_key' => 'test-key', 'model' => 'test-model'],

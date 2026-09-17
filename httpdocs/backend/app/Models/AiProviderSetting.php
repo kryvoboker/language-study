@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class AiProviderSetting extends Model
 {
-    protected $fillable = ['key', 'name', 'enabled', 'is_default', 'configuration'];
+    protected $fillable = ['key', 'name', 'prompt_instruction', 'enabled', 'is_default', 'configuration'];
 
     protected static function booted(): void
     {
