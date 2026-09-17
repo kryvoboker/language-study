@@ -4,3 +4,6 @@
 **/.env.*
 !**/.env.example
 !**/.env.*.example
+
+# Laravel Passport encryption keys are environment-specific secrets.
+/storage/oauth-*.key

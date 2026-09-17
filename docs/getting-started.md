@@ -30,6 +30,7 @@ docker compose -f .docker/dev/docker-compose.yml exec language-study-php-fpm com
 docker compose -f .docker/dev/docker-compose.yml exec language-study-php-fpm php artisan key:generate
 docker compose -f .docker/dev/docker-compose.yml exec language-study-php-fpm php artisan install:api --passport
 docker compose -f .docker/dev/docker-compose.yml exec language-study-php-fpm php artisan migrate --seed
+docker compose -f .docker/dev/docker-compose.yml exec language-study-php-fpm php artisan passport:public-client
 ```
 
 If Passport did not create keys and a personal client, run:
@@ -48,10 +49,11 @@ docker compose -f .docker/dev/docker-compose.yml exec language-study-nodejs npm 
 ## Verify the installation
 
 1. Open `http://localhost:8080`.
-2. Register a user and verify its email through the configured mail service.
-3. Sign in and enter source text in the workbench.
-4. Confirm that the request reaches `completed` and displays translation, rewrite, and language issues.
-5. Visit `/docs/api` to inspect the rendered API contract.
+2. Copy the public client ID from `passport:public-client` into `NUXT_PUBLIC_PASSPORT_CLIENT_ID` and restart Nuxt.
+3. Register a user and open the signed verification link from Mailpit.
+4. Sign in; the BFF keeps Passport tokens in HttpOnly cookies.
+5. Enter source text in the workbench and confirm the request reaches `completed`.
+6. Visit `/docs/api` to inspect the rendered API contract.
 
 ## Create an administrator
 

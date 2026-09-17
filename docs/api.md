@@ -10,6 +10,8 @@ Protected routes require a Passport bearer token and verified email. Public auth
 
 ```http
 Authorization: Bearer <passport-access-token>
+
+For the Nuxt storefront, callers use same-origin BFF routes; the BFF adds this header server-side from an HttpOnly cookie.
 ```
 
 ## Authentication endpoints
@@ -21,6 +23,7 @@ Authorization: Bearer <passport-access-token>
 | `POST` | `/auth/social/exchange` | Public | Exchange a one-time social ticket |
 | `POST` | `/auth/forgot-password` | Public | Send a reset link |
 | `POST` | `/auth/reset-password` | Public | Set a new password |
+| `POST` | `/auth/email/verification-notification` | Passport + unverified | Resend verification mail |
 
 ## User and translation endpoints
 

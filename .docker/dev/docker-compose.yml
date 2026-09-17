@@ -18,6 +18,7 @@ services:
       - "host.docker.internal:host-gateway"
     env_file:
       - ../../.docker/dev/env/.env
+      - ../../.docker/dev/env/.env.mariadb
     volumes:
       - ../../httpdocs/backend:/var/www/html
       - ../../storage:/var/www/storage

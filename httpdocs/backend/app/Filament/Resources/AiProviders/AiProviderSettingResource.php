@@ -20,8 +20,8 @@ use Filament\Tables\Table;
 class AiProviderSettingResource extends Resource
 {
     protected static ?string $model = AiProviderSetting::class;
-    protected static string|null $navigationGroup = 'AI Providers';
-    protected static string|null $navigationIcon = 'heroicon-o-cpu-chip';
+    protected static string|\UnitEnum|null $navigationGroup = 'AI Providers';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-cpu-chip';
     protected static ?string $modelLabel = 'Provider setting';
     public static function form(Schema $schema): Schema
     {
