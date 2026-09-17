@@ -11,7 +11,7 @@
         "build": "nuxt build",
         "preview": "nuxt preview",
         "postinstall": "nuxt prepare",
-        "ts:check": "biome check . && nuxt typecheck",
+        "ts:check": "biome lint . && nuxt typecheck",
         "ts:fix": "biome check --write .",
         "ts:format": "biome format --write .",
         "ts:lint": "biome lint .",
