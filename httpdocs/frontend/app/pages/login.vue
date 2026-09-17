@@ -3,11 +3,13 @@ const email = ref('')
 const password = ref('')
 const errorMessage = ref('')
 const loading = ref(false)
+const { refresh } = useAuth()
 const social = (provider: string) => navigateTo(`/api/auth/social/${provider}`)
 const login = async () => {
   loading.value = true; errorMessage.value = ''
   try {
     await $fetch('/api/auth/login', { method: 'POST', body: { email: email.value, password: password.value } })
+    await refresh()
     await navigateTo('/')
   } catch { errorMessage.value = 'Unable to sign in. Check your credentials and email verification.' } finally { loading.value = false }
 }

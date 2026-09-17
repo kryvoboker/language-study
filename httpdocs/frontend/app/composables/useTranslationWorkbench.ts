@@ -19,13 +19,15 @@ export const useTranslationWorkbench = () => {
     const requestUrl: string = url
 
     try {
-      return await $fetch<T>(requestUrl, options) as T
+      const response: unknown = await $fetch<T>(requestUrl, options)
+      return response as T
     } catch (error) {
       if ((error as { statusCode?: number }).statusCode !== 401) throw error
 
       try {
         await $fetch('/api/auth/refresh', { method: 'POST' })
-        return await $fetch<T>(requestUrl, options) as T
+        const response: unknown = await $fetch<T>(requestUrl, options)
+        return response as T
       } catch {
         throw error
       }

@@ -4,8 +4,12 @@ export default defineEventHandler(async (event): Promise<unknown> => {
   const config = useRuntimeConfig(event)
   const path = getRouterParam(event, 'path') ?? ''
   const token = getCookie(event, authCookieName)
+  const cookie = getHeader(event, 'cookie')
+  const xsrfToken = getHeader(event, 'x-xsrf-token')
   const headers: HeadersInit = {
     Accept: 'application/json',
+    ...(cookie ? { Cookie: cookie } : {}),
+    ...(xsrfToken ? { 'X-XSRF-TOKEN': xsrfToken } : {}),
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
   }
   const method = event.method

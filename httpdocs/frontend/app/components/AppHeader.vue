@@ -1,6 +1,16 @@
 <script setup lang="ts">
 const { locale, locales, setLocale } = useI18n()
 const { toggleTheme } = useStorefrontTheme()
+const { user, initialized, refresh, logout } = useAuth()
+
+onMounted(() => {
+  if (!initialized.value) void refresh()
+})
+
+const signOut = async () => {
+  await logout()
+  await navigateTo('/login')
+}
 </script>
 
 <template>
@@ -34,10 +44,18 @@ const { toggleTheme } = useStorefrontTheme()
             </li>
           </ul>
         </div>
-        <NuxtLink to="/login" class="btn btn-outline btn-sm">{{ $t('nav.login') }}</NuxtLink>
-        <NuxtLink to="/register" class="btn btn-primary btn-sm hidden sm:inline-flex">
-          {{ $t('nav.signup') }}
-        </NuxtLink>
+        <template v-if="user">
+          <NuxtLink to="/account" class="btn btn-outline btn-sm">{{ $t('nav.account') }}</NuxtLink>
+          <button type="button" class="btn btn-primary btn-sm hidden sm:inline-flex" @click="signOut">
+            {{ $t('nav.logout') }}
+          </button>
+        </template>
+        <template v-else-if="initialized">
+          <NuxtLink to="/login" class="btn btn-outline btn-sm">{{ $t('nav.login') }}</NuxtLink>
+          <NuxtLink to="/register" class="btn btn-primary btn-sm hidden sm:inline-flex">
+            {{ $t('nav.signup') }}
+          </NuxtLink>
+        </template>
       </nav>
     </div>
   </header>

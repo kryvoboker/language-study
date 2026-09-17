@@ -18,6 +18,8 @@ php artisan passport:client --personal --provider=users
 
 Translation requests accept either a valid Passport bearer token or a verified Laravel web session, including a verified Filament admin session. Session-authenticated state-changing requests must include a valid CSRF token.
 
+When the storefront and admin panel use different subdomains, set `SESSION_DOMAIN=.language-study.com` in the backend environment. The Nuxt BFF forwards the browser session cookie to Laravel, allowing a verified admin-panel session to authenticate storefront translation requests.
+
 ### Provision the public client
 
 After migrations, run the idempotent setup command:

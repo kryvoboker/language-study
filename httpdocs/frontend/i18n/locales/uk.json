@@ -1,7 +1,9 @@
 {
   "nav": {
     "login": "Увійти",
-    "signup": "Створити акаунт"
+    "signup": "Створити акаунт",
+    "account": "Мій акаунт",
+    "logout": "Вийти"
   },
   "hero": {
     "badge": "Переклад + навчання за один прохід",
@@ -38,6 +40,10 @@
     "continueWith": "Продовжити через",
     "pkceHint": "Storefront спроєктований для Passport Authorization Code + PKCE.",
     "create": "Створити акаунт"
+  },
+  "account": {
+    "title": "Мій акаунт",
+    "email": "Електронна пошта"
   },
   "theme": {
     "toggle": "Перемкнути світлу/темну тему"
