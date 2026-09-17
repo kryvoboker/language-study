@@ -27,6 +27,8 @@ For the Nuxt storefront, callers use same-origin BFF routes; the BFF adds this h
 
 ## User and translation endpoints
 
+Translation endpoints accept either a Passport bearer token or an authenticated Laravel web session (including the Filament admin session). Session-authenticated state-changing requests must include a valid CSRF token.
+
 | Method | Endpoint | Purpose |
 |--------|----------|---------|
 | `GET` | `/me` | Return the authenticated user |

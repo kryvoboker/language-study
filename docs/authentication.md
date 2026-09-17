@@ -10,6 +10,14 @@ Nuxt exposes a server-side backend-for-frontend (BFF). The BFF stores Passport a
 
 Supported local flows include registration, login, password reset, signed email verification, and blocked-account checks.
 
+The credential-login endpoint issues personal access tokens. The required personal client is provisioned for the `users` provider with:
+
+```bash
+php artisan passport:client --personal --provider=users
+```
+
+Translation requests accept either a valid Passport bearer token or a verified Laravel web session, including a verified Filament admin session. Session-authenticated state-changing requests must include a valid CSRF token.
+
 ### Provision the public client
 
 After migrations, run the idempotent setup command:
