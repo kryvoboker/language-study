@@ -1,20 +1,26 @@
 import { authCookieName, authCookieOptions, upstreamError } from '../../../utils/auth'
 
 export default defineEventHandler(async (event) => {
-  const body = await readBody<{ ticket?: string }>(event)
-  const config = useRuntimeConfig(event)
+    const body = await readBody<{
+        ticket?: string
+    }>(event)
+    const config = useRuntimeConfig(event)
 
-  try {
-    const response = await $fetch<{ access_token?: string }>(`${config.apiInternalBase}/auth/social/exchange`, {
-      method: 'POST',
-      body,
-    })
+    try {
+        const response = await $fetch<{
+            access_token?: string
+        }>(`${config.apiInternalBase}/auth/social/exchange`, {
+            method: 'POST',
+            body,
+        })
 
-    if (!response.access_token) throw createError({ statusCode: 502, statusMessage: 'Authentication service returned an invalid response.' })
-    setCookie(event, authCookieName, response.access_token, authCookieOptions(process.env.NODE_ENV === 'production'))
-    return { authenticated: true }
-  } catch (error) {
-    if (isError(error) && error.statusCode >= 400 && error.statusCode < 500) throw error
-    throw upstreamError(error)
-  }
+        if (!response.access_token) {
+          throw createError({ statusCode: 502, statusMessage: 'Authentication service returned an invalid response.' })
+        }
+        setCookie(event, authCookieName, response.access_token, authCookieOptions(process.env.NODE_ENV === 'production'))
+        return { authenticated: true }
+    } catch (error) {
+        if (isError(error) && error.statusCode >= 400 && error.statusCode < 500) throw error
+        throw upstreamError(error)
+    }
 })

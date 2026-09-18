@@ -172,3 +172,109 @@ if (!function_exists('json_decode_throw')) {
 		return json_decode($json, $associative, $depth, $flags | JSON_THROW_ON_ERROR);
 	}
 }
+
+if (!function_exists('decode_html_entities')) {
+	/**
+	 * @param string|null $string
+	 *
+	 * @return string
+	 */
+	function decode_html_entities(?string $string): string
+	{
+		return html_entity_decode((string)$string, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+	}
+}
+
+if (!function_exists('escape_special_html')) {
+	/**
+	 * @param string|null $html_string
+	 *
+	 * @return string
+	 */
+	function escape_special_html(?string $html_string): string
+	{
+		$prepared_html = preg_replace_callback('/<script>.*?<\/script>/s', function (array $match): string {
+			return Str::replace(['<', '>'], ['&lt;', '&gt;'], $match[0], false);
+		}, decode_html_entities($html_string)) ?? '';
+
+		return Str::replace("'", '&apos;', $prepared_html, false);
+	}
+}
+
+if (!function_exists('sanitize_str')) {
+	/**
+	 * @param string|null $string
+	 *
+	 * @return string
+	 */
+	function sanitize_str(?string $string): string
+	{
+		if ($string === null) {
+			return '';
+		}
+
+		$sanitized_value = Str::trim(strip_tags(decode_html_entities($string)));
+
+		return (string)Str::replaceMatches('/\s+/', ' ', $sanitized_value);
+	}
+}
+
+if (!function_exists('clear_telephone')) {
+	/**
+	 * @param string|null $telephone
+	 * @param bool        $is_delete_first_nums
+	 *
+	 * @return string
+	 */
+	function clear_telephone(?string $telephone, bool $is_delete_first_nums = false): string
+	{
+		if (!isset($telephone)) {
+			return '';
+		}
+
+		if ($is_delete_first_nums) {
+			return preg_replace(['/\D+/', '/^38/'], '', $telephone) ?: $telephone;
+		}
+
+		return preg_replace('/\D+/', '', $telephone) ?: $telephone;
+	}
+}
+
+if (!function_exists('parse_telephone')) {
+	/**
+	 * @param string $telephone
+	 *
+	 * @return string
+	 */
+	function parse_telephone(string $telephone): string
+	{
+		$telephone = clear_telephone($telephone, true);
+
+		$mask = '+38 (___) ___-__-__';
+		$phone_length = Str::length($telephone);
+
+		for ($index_number = 0; $index_number < $phone_length; $index_number++) {
+			$mask = (string) Str::replaceMatches('/_/', $telephone[$index_number], $mask, 1);
+		}
+
+		return $mask;
+	}
+}
+
+if (!function_exists('trim_strs_in_arr')) {
+	/**
+	 * @param array<int|string, mixed> $arr
+	 *
+	 * @return array<int|string, mixed>
+	 */
+	function trim_strs_in_arr(array $arr): array
+	{
+		return array_map(function ($item) {
+			if (is_string($item)) {
+				return Str::trim($item);
+			}
+
+			return $item;
+		}, $arr);
+	}
+}
