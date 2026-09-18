@@ -24,7 +24,7 @@ class TranslationRequestController extends Controller
         $source_text = $request->string('source_text')->toString();
         $source_language = $request->string('source_language')->toString();
         $target_language = $request->string('target_language')->toString();
-		$current_locale = $request->string('locale')->toString();
+        $current_locale = $request->string('locale')->toString();
         $request_hash = TranslationRequest::generateRequestHash($source_text, $source_language, $target_language, $current_locale);
         $cached_request = TranslationRequest::query()
             ->where('request_hash', $request_hash)
@@ -70,7 +70,7 @@ class TranslationRequestController extends Controller
         $user = $request->user();
         abort_if(!($user instanceof User) || $translation_request->user_id !== $user->id, 404);
         $fresh_request = $translation_request->fresh();
-		abort_if(!($fresh_request instanceof TranslationRequest), 404);
+        abort_if(!($fresh_request instanceof TranslationRequest), 404);
 
         return response()->json($this->payload($fresh_request));
     }
@@ -91,7 +91,7 @@ class TranslationRequestController extends Controller
             'status' => $request->status->value,
             'translation' => data_get($request->result, 'translation'),
             'source_corrected' => data_get($request->result, 'source_corrected'),
-            'natural_version' => data_get($request->result, 'natural_version'),
+            'natural_usage' => data_get($request->result, 'natural_usage'),
             'issues' => data_get($request->result, 'issues', []),
             'error' => $request->status === TranslationStatus::Failed ? 'Translation could not be completed.' : null,
         ];

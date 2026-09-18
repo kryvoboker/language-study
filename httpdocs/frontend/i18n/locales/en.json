@@ -24,7 +24,9 @@
     "limitError": "Text exceeds the {limit} character limit."
   },
   "coach": {
-    "natural": "Natural native-like version",
+    "natural": "How native speakers say it",
+    "expression": "Expression",
+    "example": "Usage example",
     "title": "Language coach",
     "notes": "notes",
     "corrected": "Corrected source",

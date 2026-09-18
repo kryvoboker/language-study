@@ -46,7 +46,7 @@ Controllers remain transport-focused. Provider-specific SDK behavior belongs in 
 2. Laravel validates, rate-limits, and persists a `translation_requests` row.
 3. `StartTranslationJob` starts a cancellable background provider operation.
 4. The operation ID is stored, and `PollTranslationJob` retrieves it until terminal state.
-5. The API returns translation data, the natural rewrite, and language issues.
+5. The API returns translation data, an optional source-language natural expression and usage example, and language issues.
 6. Editing the source cancels the active local request and propagates cancellation upstream.
 
 This keeps PHP-FPM requests short-lived, allows independent queue scaling, and avoids coupling the domain model to one AI vendor.

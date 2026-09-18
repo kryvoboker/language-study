@@ -12,7 +12,7 @@
 6. The provider adapter creates a cancellable background AI operation.
 7. Nuxt polls the local request approximately every 350 ms.
 8. The backend poll job parses structured JSON and stores the result.
-9. Nuxt renders translation, natural rewrite, and explanations independently.
+9. Nuxt renders the translation, an optional source-language usage object with an expression and one example, and explanations independently.
 10. If the user edits again, cancellation is propagated to the backend and provider.
 
 ## Request states
@@ -24,6 +24,21 @@
 | `completed` | A result is available |
 | `failed` | Processing ended with an error |
 | `cancelled` | The request was cancelled before completion |
+
+## Natural variant response
+
+For a single word or phrase, the provider may return a `natural_usage` object with the source-language expression and one source-language usage example:
+
+```json
+{
+  "natural_usage": {
+    "expression": "on my own",
+    "example": "I learned how to build this website on my own."
+  }
+}
+```
+
+For complete sentences, or when no useful lexical example exists, `natural_usage` is `null`. The main `translation` remains the only translated result and is not duplicated in the usage section. This contract applies to newly created records; the project intentionally does not support legacy stored result shapes.
 
 ## Why polling?
 

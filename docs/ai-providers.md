@@ -83,6 +83,8 @@ Provider keys are matched case-insensitively and with surrounding whitespace ign
 
 The prompt instruction is stored per provider setting, so different assistants can use different translation and language-coaching behavior. Existing settings without an instruction continue to use the built-in compatibility instruction until they are edited.
 
+The translation response keeps the ready `translation` separate from the optional `natural_usage` object. For a short word or phrase, the object contains `expression` and one source-language `example`; for a complete sentence or an input without a useful lexical example, it is `null`. The OpenAI adapter enforces this shape through its strict JSON schema and does not support legacy stored result formats while the project is under development.
+
 ## Adding a provider
 
 1. Add a provider key to `AiProviderType`.

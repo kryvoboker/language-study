@@ -44,7 +44,7 @@ Content-Type: application/json
 Authorization: Bearer <passport-access-token>
 
 {
-  "source_text": "I have been learning English for two years.",
+  "source_text": "on my own",
   "source_language": "en",
   "target_language": "uk"
 }
@@ -56,12 +56,17 @@ The endpoint returns `202 Accepted` with a request resource. Poll it until `comp
 {
   "id": "00000000-0000-0000-0000-000000000000",
   "status": "completed",
-  "translation": "Я вивчаю англійську вже два роки.",
-  "natural_version": "I've been learning English for two years.",
+  "translation": "самостійно",
+  "natural_usage": {
+    "expression": "on my own",
+    "example": "I learned how to build this website on my own."
+  },
   "source_corrected": null,
   "issues": []
 }
 ```
+
+`natural_usage` is `null` when the source text is a complete sentence or no useful source-language word or phrase example exists. It contains the source-language expression and one usage example for short lexical inputs. The ready `translation` is returned separately and is not repeated in this object.
 
 ## Request limits
 

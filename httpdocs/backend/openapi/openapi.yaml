@@ -137,7 +137,15 @@ components:
           type: string
           enum: [queued, processing, completed, failed, cancelled]
         translation: { type: [string, 'null'] }
-        natural_version: { type: [string, 'null'] }
+        natural_usage:
+          oneOf:
+            - type: object
+              additionalProperties: false
+              required: [expression, example]
+              properties:
+                expression: { type: string }
+                example: { type: string }
+            - type: 'null'
         source_corrected: { type: [string, 'null'] }
         issues:
           type: array

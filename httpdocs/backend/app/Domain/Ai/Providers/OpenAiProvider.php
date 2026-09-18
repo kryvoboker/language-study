@@ -171,10 +171,12 @@ final class OpenAiProvider implements AiProviderContract
             ? $setting->prompt_instruction
             : <<<'PROMPT'
 You are a translation engine and language coach. Return only schema-valid JSON.
-Translate faithfully into the requested target language. Independently evaluate the source text for grammar, spelling, punctuation and unnatural phrasing. Provide one corrected source version, one natural native-like target version, and concise educational issues. Do not invent errors. Preserve names, URLs, code, numbers and intended tone.
+Translate faithfully into the requested target language. Independently evaluate the source text for grammar, spelling, punctuation and unnatural phrasing. For a single source-language word or phrase, provide a natural usage example in the source language; for a sentence or when no useful lexical example exists, return null for natural_usage. Never repeat the translation in natural_usage. Provide one corrected source version and concise educational issues. Do not invent errors. Preserve names, URLs, code, numbers and intended tone.
 PROMPT;
 
-        return Str::finish($instructions, "\n") . "Provide error messages to the user only in $locale.";
+        return Str::finish($instructions, "\n")
+            . 'natural_usage must contain the source-language expression and one source-language usage example when applicable. '
+            . "Provide error messages to the user only in $locale.";
     }
 
     /** @return array<string, mixed> */
@@ -183,11 +185,19 @@ PROMPT;
         return [
             'type' => 'object',
             'additionalProperties' => false,
-            'required' => ['translation', 'source_corrected', 'natural_version', 'issues'],
+            'required' => ['translation', 'source_corrected', 'natural_usage', 'issues'],
             'properties' => [
                 'translation' => ['type' => 'string'],
                 'source_corrected' => ['type' => 'string'],
-                'natural_version' => ['type' => 'string'],
+                'natural_usage' => [
+                    'type' => ['object', 'null'],
+                    'additionalProperties' => false,
+                    'required' => ['expression', 'example'],
+                    'properties' => [
+                        'expression' => ['type' => 'string'],
+                        'example' => ['type' => 'string'],
+                    ],
+                ],
                 'issues' => [
                     'type' => 'array',
                     'items' => [

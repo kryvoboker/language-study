@@ -102,8 +102,8 @@ class TranslationAuthenticationTest extends TestCase
             'source_text' => 'Hello',
             'source_language' => 'en',
             'target_language' => 'uk',
-            'request_hash' => TranslationRequest::generateRequestHash(' Hello ', 'EN', 'uk'),
-            'locale' => 'en',
+            'request_hash' => TranslationRequest::generateRequestHash(' Hello ', 'EN', 'uk', 'ru'),
+            'locale' => 'ru',
             'status' => TranslationStatus::Completed,
             'result' => ['translation' => 'Привіт'],
             'completed_at' => now(),
@@ -122,9 +122,82 @@ class TranslationAuthenticationTest extends TestCase
         Queue::assertNothingPushed();
         $this->assertDatabaseHas('translation_requests', [
             'user_id' => $user->id,
-            'request_hash' => TranslationRequest::generateRequestHash('Hello', 'en', 'uk'),
+            'request_hash' => TranslationRequest::generateRequestHash('Hello', 'en', 'uk', 'ru'),
             'status' => TranslationStatus::Completed->value,
         ]);
+    }
+
+    public function test_completed_translation_exposes_a_natural_variant_without_repeating_the_translation(): void
+    {
+        Queue::fake();
+        $user = User::factory()->create();
+        $this->enableProvider();
+        TranslationRequest::query()->create([
+            'user_id' => User::factory()->create()->id,
+            'source_text' => 'on my own',
+            'source_language' => 'en',
+            'target_language' => 'ru',
+            'request_hash' => TranslationRequest::generateRequestHash('on my own', 'en', 'ru', 'ru'),
+            'locale' => 'ru',
+            'status' => TranslationStatus::Completed,
+            'result' => [
+                'translation' => 'самостоятельно',
+                'natural_usage' => [
+                    'expression' => 'on my own',
+                    'example' => 'I learned this on my own.',
+                ],
+            ],
+            'completed_at' => now(),
+        ]);
+        Passport::actingAs($user, ['translate']);
+
+        $this->postJson('/api/v1/translation-requests', [
+            'source_text' => 'on my own',
+            'source_language' => 'en',
+            'target_language' => 'ru',
+            'locale' => 'ru',
+        ])
+            ->assertOk()
+            ->assertJsonPath('translation', 'самостоятельно')
+            ->assertJsonPath('natural_usage.expression', 'on my own')
+            ->assertJsonPath('natural_usage.example', 'I learned this on my own.');
+
+        Queue::assertNothingPushed();
+    }
+
+    public function test_completed_sentence_can_have_no_natural_variant(): void
+    {
+        Queue::fake();
+        $user = User::factory()->create();
+        $this->enableProvider();
+        TranslationRequest::query()->create([
+            'user_id' => User::factory()->create()->id,
+            'source_text' => 'I learned this on my own.',
+            'source_language' => 'en',
+            'target_language' => 'ru',
+            'request_hash' => TranslationRequest::generateRequestHash('I learned this on my own.', 'en', 'ru', 'ru'),
+            'locale' => 'ru',
+            'status' => TranslationStatus::Completed,
+            'result' => [
+                'translation' => 'Я выучил это самостоятельно.',
+                'natural_usage' => null,
+                'issues' => [],
+            ],
+            'completed_at' => now(),
+        ]);
+        Passport::actingAs($user, ['translate']);
+
+        $this->postJson('/api/v1/translation-requests', [
+            'source_text' => 'I learned this on my own.',
+            'source_language' => 'en',
+            'target_language' => 'ru',
+            'locale' => 'ru',
+        ])
+            ->assertOk()
+            ->assertJsonPath('translation', 'Я выучил это самостоятельно.')
+            ->assertJsonPath('natural_usage', null);
+
+        Queue::assertNothingPushed();
     }
 
     /** @param array<string, int> $configuration */

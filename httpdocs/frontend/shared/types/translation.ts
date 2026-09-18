@@ -8,12 +8,17 @@ export interface LanguageIssue {
   severity: 'info' | 'warning' | 'error'
 }
 
+export interface NaturalVariant {
+  expression: string
+  example: string
+}
+
 export interface TranslationRequestDto {
   id: string
   status: TranslationStatus
   translation: string | null
   source_corrected: string | null
-  natural_version: string | null
+  natural_usage: NaturalVariant | null
   issues: LanguageIssue[]
   error: string | null
 }

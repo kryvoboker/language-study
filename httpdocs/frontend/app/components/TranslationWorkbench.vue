@@ -45,11 +45,20 @@ const copyTranslation = async () => {
       </div>
     </div>
 
-    <div v-if="current?.natural_version || current?.issues?.length" class="border-t border-base-content/10 bg-base-200/20 p-4 sm:p-6">
+    <div v-if="current?.natural_usage || current?.issues?.length" class="border-t border-base-content/10 bg-base-200/20 p-4 sm:p-6">
       <div class="grid gap-4 xl:grid-cols-[0.9fr_1.1fr]">
-        <article v-if="current?.natural_version" class="rounded-2xl border border-primary/20 bg-primary/5 p-5">
+        <article v-if="current?.natural_usage" class="rounded-2xl border border-primary/20 bg-primary/5 p-5">
           <div class="mb-3 flex items-center gap-2 text-primary"><span class="icon-[tabler--message-language] size-5"/><h3 class="font-semibold">{{ $t('coach.natural') }}</h3></div>
-          <p class="text-base leading-7">{{ current.natural_version }}</p>
+          <div class="space-y-4">
+            <div class="rounded-xl border border-primary/20 bg-base-100/70 p-4">
+              <p class="text-xs font-semibold uppercase tracking-[0.16em] text-primary/70">{{ $t('coach.expression') }}</p>
+              <p class="mt-2 text-xl font-semibold leading-8 text-base-content">{{ current.natural_usage.expression }}</p>
+            </div>
+            <div class="rounded-xl border border-base-content/10 bg-base-100/60 p-4">
+              <p class="text-xs font-semibold uppercase tracking-[0.16em] text-base-content/50">{{ $t('coach.example') }}</p>
+              <p class="mt-2 text-base leading-7 text-base-content/80">{{ current.natural_usage.example }}</p>
+            </div>
+          </div>
         </article>
         <article class="rounded-2xl border border-base-content/10 bg-base-100 p-5">
           <div class="mb-4 flex items-center justify-between"><div class="flex items-center gap-2"><span class="icon-[tabler--school] size-5 text-secondary"/><h3 class="font-semibold">{{ $t('coach.title') }}</h3></div><span class="badge badge-soft badge-secondary">{{ current?.issues?.length ?? 0 }} {{ $t('coach.notes') }}</span></div>
