@@ -1,15 +1,20 @@
-import { authCookieName, authCookieOptions, refreshCookieName, upstreamError } from '../../utils/auth'
+import { authCookieName, authCookieOptions, refreshCookieName, upstreamError, xdebugSessionCookieHeader } from '../../utils/auth'
 
 export default defineEventHandler(async (event) => {
   const refreshToken = getCookie(event, refreshCookieName)
   const config = useRuntimeConfig(event)
+  const xdebugCookie = xdebugSessionCookieHeader(event)
 
   if (!refreshToken) throw createError({ statusCode: 401, statusMessage: 'Unauthenticated.' })
 
   try {
     const response = await $fetch<{ access_token?: string; refresh_token?: string }>(`${config.apiInternalOrigin}/oauth/token`, {
       method: 'POST',
-      headers: { 'content-type': 'application/x-www-form-urlencoded', accept: 'application/json' },
+      headers: {
+        'content-type': 'application/x-www-form-urlencoded',
+        accept: 'application/json',
+        ...(xdebugCookie ? { Cookie: xdebugCookie } : {}),
+      },
       body: new URLSearchParams({
         grant_type: 'refresh_token',
         client_id: String(config.public.passportClientId),

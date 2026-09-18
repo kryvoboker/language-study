@@ -1,13 +1,15 @@
-import { authCookieName, authCookieOptions, upstreamError } from '../../utils/auth'
+import { authCookieName, authCookieOptions, upstreamError, xdebugSessionCookieHeader } from '../../utils/auth'
 
 export default defineEventHandler(async (event) => {
   const body = await readBody<{ email?: string; password?: string }>(event)
   const config = useRuntimeConfig(event)
+  const xdebugCookie = xdebugSessionCookieHeader(event)
 
   try {
     const response = await $fetch<{ access_token?: string }>(`${config.apiInternalBase}/auth/login`, {
       method: 'POST',
       body,
+      ...(xdebugCookie ? { headers: { Cookie: xdebugCookie } } : {}),
     })
 
     if (!response.access_token) {

@@ -18,6 +18,7 @@ final class AiProviderSettingForm
 	{
 		$max_input_characters     = (int)config('app.max_characters_for_input_translate', 12000);
 		$default_input_characters = (int)config('app.default_characters_for_input_translate', 500);
+		$default_model            = (string)config('ai.providers.openai.default_model', 'gpt-5-nano');
 
 		return $schema->components([
 			Section::make()
@@ -57,7 +58,7 @@ final class AiProviderSettingForm
 							TextInput::make('configuration.model')
 								->helperText('Chooses which OpenAI model performs translation and language analysis.')
 								->required()
-								->default('gpt-5.6-luna'),
+								->default($default_model),
 							Select::make('configuration.reasoning_effort')
 								->label('Reasoning effort')
 								->options([

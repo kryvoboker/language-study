@@ -16,178 +16,184 @@ use OpenAI;
 
 final class OpenAiProvider implements AiProviderContract
 {
-    /**
-     * @param AiProviderSetting     $setting
-     * @param TranslationPromptData $data
-     *
-     * @throws JsonException
-     * @return ProviderOperationData
-     */
-    public function start(AiProviderSetting $setting, TranslationPromptData $data): ProviderOperationData
-    {
-        $configuration = $this->configuration($setting);
-        $client = OpenAI::client($configuration['api_key']);
+	/**
+	 * @param AiProviderSetting     $setting
+	 * @param TranslationPromptData $data
+	 *
+	 * @return ProviderOperationData
+	 * @throws JsonException
+	 */
+	public function start(AiProviderSetting $setting, TranslationPromptData $data): ProviderOperationData
+	{
+		$configuration = $this->configuration($setting);
+		$client        = OpenAI::client($configuration['api_key']);
 
-        $response = $client->responses()->create([
-            'model' => $configuration['model'],
-            ...$configuration['request'],
-            'instructions' => $this->instructions($setting, $data->locale),
-            'input' => [[
-                'role' => 'user',
-                'content' => [[
-                    'type' => 'input_text',
-                    'text' => json_encode_throw([
-                        'source_language' => $data->source_language,
-                        'target_language' => $data->target_language,
-                        'text' => $data->text,
-                    ], JSON_UNESCAPED_UNICODE),
-                ]],
-            ]],
-            'text' => [
-                'format' => [
-                    'type' => 'json_schema',
-                    'name' => 'language_review',
-                    'strict' => true,
-                    'schema' => $this->schema(),
-                ],
-            ],
-        ]);
+		$response = $client->responses()->create([
+			'model'        => $configuration['model'],
+			...$configuration['request'],
+			'instructions' => $this->instructions($setting, $data->locale),
+			'input'        => [
+				[
+					'role'    => 'user',
+					'content' => [
+						[
+							'type' => 'input_text',
+							'text' => json_encode_throw([
+								'source_language' => $data->source_language,
+								'target_language' => $data->target_language,
+								'text'            => $data->text,
+							], JSON_UNESCAPED_UNICODE),
+						]
+					],
+				]
+			],
+			'text'         => [
+				'format' => [
+					'type'   => 'json_schema',
+					'name'   => 'language_review',
+					'strict' => true,
+					'schema' => $this->schema(),
+				],
+			],
+		]);
 
-        return new ProviderOperationData($response->id, (string) $response->status);
-    }
+		return new ProviderOperationData($response->id, (string)$response->status);
+	}
 
-    /**
-     * @param AiProviderSetting $setting
-     * @param string            $operation_id
-     *
-     * @throws JsonException
-     * @return ProviderResultData
-     */
-    public function retrieve(AiProviderSetting $setting, string $operation_id): ProviderResultData
-    {
-        $client = OpenAI::client($this->configuration($setting)['api_key']);
-        $response = $client->responses()->retrieve($operation_id);
-        $status = $response->status;
+	/**
+	 * @param AiProviderSetting $setting
+	 * @param string            $operation_id
+	 *
+	 * @return ProviderResultData
+	 * @throws JsonException
+	 */
+	public function retrieve(AiProviderSetting $setting, string $operation_id): ProviderResultData
+	{
+		$client   = OpenAI::client($this->configuration($setting)['api_key']);
+		$response = $client->responses()->retrieve($operation_id);
+		$status   = $response->status;
 
-        if ($status !== 'completed') {
-            return new ProviderResultData($status, error: $response->error?->message ?? null);
-        }
+		if ($status !== 'completed') {
+			return new ProviderResultData($status, error: $response->error?->message ?? null);
+		}
 
-        $decoded = json_decode_throw($response->outputText);
-        return new ProviderResultData($status, $decoded);
-    }
+		$decoded = json_decode_throw($response->outputText);
+		return new ProviderResultData($status, $decoded);
+	}
 
-    public function cancel(AiProviderSetting $setting, string $operation_id): void
-    {
-        $client = OpenAI::client($this->configuration($setting)['api_key']);
-        $client->responses()->cancel($operation_id);
-    }
+	public function cancel(AiProviderSetting $setting, string $operation_id): void
+	{
+		$client = OpenAI::client($this->configuration($setting)['api_key']);
+		$client->responses()->cancel($operation_id);
+	}
 
-    /**
-     * @return array{api_key: string, model: string, request: array<string, mixed>}
-     */
-    private function configuration(AiProviderSetting $setting): array
-    {
-        $configuration = $setting->configuration ?? [];
-        $apiKey = $configuration['api_key'] ?? null;
+	/**
+	 * @return array{api_key: string, model: string, request: array<string, mixed>}
+	 */
+	private function configuration(AiProviderSetting $setting): array
+	{
+		$configuration = $setting->configuration ?? [];
+		$apiKey        = $configuration['api_key'] ?? null;
 
-        if (! is_string($apiKey) || Str::trim($apiKey) === '') {
-            throw new InvalidArgumentException("AI provider [$setting->key] has no API key configured.");
-        }
+		if (!is_string($apiKey) || Str::trim($apiKey) === '') {
+			throw new InvalidArgumentException("AI provider [$setting->key] has no API key configured.");
+		}
 
-        $model = $configuration['model'] ?? 'gpt-5.6-luna';
+		$model = blank($configuration['model'])
+			? Str::trim((string)config('ai.providers.openai.default_model', 'gpt-5-nano'))
+			: Str::trim($configuration['model']);
 
-        $request = [
-            'background' => true,
-            'store' => true,
-        ];
+		$request = [
+			'background' => true,
+			'store'      => true,
+		];
 
-        foreach (['background', 'store'] as $key) {
-            if (array_key_exists($key, $configuration) && is_bool($configuration[$key])) {
-                $request[$key] = $configuration[$key];
-            }
-        }
+		foreach (['background', 'store'] as $key) {
+			if (array_key_exists($key, $configuration) && is_bool($configuration[$key])) {
+				$request[$key] = $configuration[$key];
+			}
+		}
 
-        foreach (['max_output_tokens'] as $key) {
-            if (array_key_exists($key, $configuration) && is_numeric($configuration[$key])) {
-                $value = (int) $configuration[$key];
+		$key = 'max_output_tokens';
 
-                if ($value > 0) {
-                    $request[$key] = $value;
-                }
-            }
-        }
+		if (array_key_exists($key, $configuration) && is_numeric($configuration[$key])) {
+			$value = (int)$configuration[$key];
 
-        foreach (['temperature'] as $key) {
-            if (array_key_exists($key, $configuration) && is_numeric($configuration[$key])) {
-                $request[$key] = (float) $configuration[$key];
-            }
-        }
+			if ($value > 0) {
+				$request[$key] = $value;
+			}
+		}
 
-        foreach (['service_tier'] as $key) {
-            if (is_string($configuration[$key] ?? null) && Str::trim($configuration[$key]) !== '') {
-                $request[$key] = $configuration[$key];
-            }
-        }
+		$key = 'temperature';
 
-        $reasoning = [];
+		if (array_key_exists($key, $configuration) && is_numeric($configuration[$key])) {
+			$request[$key] = (float)$configuration[$key];
+		}
 
-        foreach (['effort', 'summary', 'mode'] as $key) {
-            $configurationKey = "reasoning_$key";
+		$key = 'service_tier';
 
-            if (is_string($configuration[$configurationKey] ?? null) && Str::trim($configuration[$configurationKey]) !== '') {
-                $reasoning[$key] = $configuration[$configurationKey];
-            }
-        }
+		if (is_string($configuration[$key] ?? null) && Str::trim($configuration[$key]) !== '') {
+			$request[$key] = $configuration[$key];
+		}
 
-        if ($reasoning !== []) {
-            $request['reasoning'] = $reasoning;
-        }
+		$reasoning = [];
 
-        return [
-            'api_key' => $apiKey,
-            'model' => is_string($model) && Str::trim($model) !== '' ? $model : 'gpt-5.6-luna',
-            'request' => $request,
-        ];
-    }
+		foreach (['effort', 'summary', 'mode'] as $key) {
+			$configurationKey = "reasoning_$key";
 
-    private function instructions(AiProviderSetting $setting, string $locale): string
-    {
-        $instructions = is_string($setting->prompt_instruction) && Str::trim($setting->prompt_instruction) !== ''
-            ? $setting->prompt_instruction
-            : <<<'PROMPT'
+			if (is_string($configuration[$configurationKey] ?? null) && Str::trim($configuration[$configurationKey]) !== '') {
+				$reasoning[$key] = $configuration[$configurationKey];
+			}
+		}
+
+		if ($reasoning !== []) {
+			$request['reasoning'] = $reasoning;
+		}
+
+		return [
+			'api_key' => $apiKey,
+			'model'   => $model,
+			'request' => $request,
+		];
+	}
+
+	private function instructions(AiProviderSetting $setting, string $locale): string
+	{
+		$instructions = is_string($setting->prompt_instruction) && Str::trim($setting->prompt_instruction) !== ''
+			? $setting->prompt_instruction
+			: <<<'PROMPT'
 You are a translation engine and language coach. Return only schema-valid JSON.
 Translate faithfully into the requested target language. Independently evaluate the source text for grammar, spelling, punctuation and unnatural phrasing. Provide one corrected source version, one natural native-like target version, and concise educational issues. Do not invent errors. Preserve names, URLs, code, numbers and intended tone.
 PROMPT;
 
-        return Str::finish($instructions, "\n") . "Provide error messages to the user only in {$locale}.";
-    }
+		return Str::finish($instructions, "\n") . "Provide error messages to the user only in $locale.";
+	}
 
-    private function schema(): array
-    {
-        return [
-            'type' => 'object',
-            'additionalProperties' => false,
-            'required' => ['translation', 'source_corrected', 'natural_version', 'issues'],
-            'properties' => [
-                'translation' => ['type' => 'string'],
-                'source_corrected' => ['type' => 'string'],
-                'natural_version' => ['type' => 'string'],
-                'issues' => [
-                    'type' => 'array',
-                    'items' => [
-                        'type' => 'object', 'additionalProperties' => false,
-                        'required' => ['type', 'original', 'correction', 'explanation', 'severity'],
-                        'properties' => [
-                            'type' => ['type' => 'string'],
-                            'original' => ['type' => 'string'],
-                            'correction' => ['type' => 'string'],
-                            'explanation' => ['type' => 'string'],
-                            'severity' => ['type' => 'string', 'enum' => ['info', 'warning', 'error']],
-                        ],
-                    ],
-                ],
-            ],
-        ];
-    }
+	private function schema(): array
+	{
+		return [
+			'type'                 => 'object',
+			'additionalProperties' => false,
+			'required'             => ['translation', 'source_corrected', 'natural_version', 'issues'],
+			'properties'           => [
+				'translation'      => ['type' => 'string'],
+				'source_corrected' => ['type' => 'string'],
+				'natural_version'  => ['type' => 'string'],
+				'issues'           => [
+					'type'  => 'array',
+					'items' => [
+						'type'       => 'object', 'additionalProperties' => false,
+						'required'   => ['type', 'original', 'correction', 'explanation', 'severity'],
+						'properties' => [
+							'type'        => ['type' => 'string'],
+							'original'    => ['type' => 'string'],
+							'correction'  => ['type' => 'string'],
+							'explanation' => ['type' => 'string'],
+							'severity'    => ['type' => 'string', 'enum' => ['info', 'warning', 'error']],
+						],
+					],
+				],
+			],
+		];
+	}
 }

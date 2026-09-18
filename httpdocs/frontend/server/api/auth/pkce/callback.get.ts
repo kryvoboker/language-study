@@ -1,10 +1,11 @@
-import { authCookieName, authCookieOptions, pkceStateCookieName, pkceVerifierCookieName, refreshCookieName, upstreamError } from '../../../utils/auth'
+import { authCookieName, authCookieOptions, pkceStateCookieName, pkceVerifierCookieName, refreshCookieName, upstreamError, xdebugSessionCookieHeader } from '../../../utils/auth'
 
 export default defineEventHandler(async (event) => {
   const query = getQuery(event)
   const state = getCookie(event, pkceStateCookieName)
   const verifier = getCookie(event, pkceVerifierCookieName)
   const config = useRuntimeConfig(event)
+  const xdebugCookie = xdebugSessionCookieHeader(event)
 
   if (!state || !verifier || typeof query.state !== 'string' || query.state !== state || typeof query.code !== 'string') {
     throw createError({ statusCode: 400, statusMessage: 'Invalid authorization response.' })
@@ -13,7 +14,11 @@ export default defineEventHandler(async (event) => {
   try {
     const response = await $fetch<{ access_token?: string; refresh_token?: string }>(`${config.apiInternalOrigin}/oauth/token`, {
       method: 'POST',
-      headers: { 'content-type': 'application/x-www-form-urlencoded', accept: 'application/json' },
+      headers: {
+        'content-type': 'application/x-www-form-urlencoded',
+        accept: 'application/json',
+        ...(xdebugCookie ? { Cookie: xdebugCookie } : {}),
+      },
       body: new URLSearchParams({
         grant_type: 'authorization_code',
         client_id: String(config.public.passportClientId),
