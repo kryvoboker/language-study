@@ -95,11 +95,11 @@ final class OpenAiProvider implements AiProviderContract
 		$configuration = $setting->configuration ?? [];
 		$apiKey        = $configuration['api_key'] ?? null;
 
-		if (!is_string($apiKey) || Str::trim($apiKey) === '') {
+		if (!is_string($apiKey) || blank($apiKey)) {
 			throw new InvalidArgumentException("AI provider [$setting->key] has no API key configured.");
 		}
 
-		$model = blank($configuration['model'])
+		$model = blank($configuration['model'] ?? null)
 			? Str::trim((string)config('ai.providers.openai.default_model', 'gpt-5-nano'))
 			: Str::trim($configuration['model']);
 
