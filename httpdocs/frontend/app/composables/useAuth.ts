@@ -2,6 +2,7 @@ export interface AuthUser {
   id: string
   name: string
   email: string
+  max_input_characters: number
 }
 
 export const useAuth = () => {

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 const {
-  sourceText, sourceLanguage, targetLanguage, current, isBusy, errorMessage, schedule, translate,
+  sourceText, sourceLanguage, targetLanguage, current, isBusy, errorMessage, inputCharacterLimit, schedule, translate,
 } = useTranslationWorkbench()
 
 const languages = [
@@ -31,8 +31,8 @@ const copyTranslation = async () => {
 
     <div class="workspace-grid">
       <div class="text-panel border-b border-base-content/10 p-5 lg:border-e lg:border-b-0 sm:p-7">
-        <div class="mb-4 flex items-center justify-between"><div><p class="text-xs font-semibold uppercase tracking-[0.18em] text-base-content/45">{{ $t('translator.source') }}</p><h2 class="mt-1 text-lg font-medium">{{ $t('translator.write') }}</h2></div><span class="badge badge-soft badge-neutral">{{ sourceText.length }}/12000</span></div>
-        <textarea v-model="sourceText" maxlength="12000" class="textarea h-72 w-full resize-none border-0 bg-transparent px-0 text-xl leading-relaxed focus:outline-none" :placeholder="$t('translator.placeholder')" @input="schedule" />
+        <div class="mb-4 flex items-center justify-between"><div><p class="text-xs font-semibold uppercase tracking-[0.18em] text-base-content/45">{{ $t('translator.source') }}</p><h2 class="mt-1 text-lg font-medium">{{ $t('translator.write') }}</h2></div><span class="badge badge-soft" :class="sourceText.length > inputCharacterLimit ? 'badge-error' : 'badge-neutral'">{{ sourceText.length }}/{{ inputCharacterLimit }}</span></div>
+        <textarea v-model="sourceText" class="textarea h-72 w-full resize-none border-0 bg-transparent px-0 text-xl leading-relaxed focus:outline-none" :placeholder="$t('translator.placeholder')" @input="schedule" />
         <div class="mt-4 flex items-center justify-between border-t border-base-content/10 pt-4"><p class="max-w-xl text-xs leading-5 text-base-content/50">{{ $t('translator.privacyHint') }}</p><button type="button" class="btn btn-primary btn-sm" :disabled="!sourceText.trim() || isBusy" @click="translate"><span class="icon-[tabler--sparkles] size-4" />{{ $t('translator.translate') }}</button></div>
       </div>
 

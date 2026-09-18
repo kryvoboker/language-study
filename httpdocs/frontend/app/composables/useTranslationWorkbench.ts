@@ -1,12 +1,19 @@
 import type { TranslationRequestDto } from '#shared/types/translation'
 
 export const useTranslationWorkbench = () => {
+  const { t } = useI18n()
+  const { user } = useAuth()
   const sourceText = ref('')
   const sourceLanguage = ref('en')
   const targetLanguage = ref('uk')
   const current = ref<TranslationRequestDto | null>(null)
   const isBusy = computed(() => current.value?.status === 'queued' || current.value?.status === 'processing')
   const errorMessage = ref<string | null>(null)
+  const inputCharacterLimit = computed(() => user.value?.max_input_characters ?? 12000)
+
+  const setLimitError = () => {
+    errorMessage.value = t('translator.limitError', { limit: inputCharacterLimit.value })
+  }
 
   let debounceTimer: ReturnType<typeof setTimeout> | undefined
   let pollTimer: ReturnType<typeof setTimeout> | undefined
@@ -67,6 +74,11 @@ export const useTranslationWorkbench = () => {
       current.value = null
       return
     }
+    if (text.length > inputCharacterLimit.value) {
+      current.value = null
+      setLimitError()
+      return
+    }
     errorMessage.value = null
     const runSequence = ++sequence
     try {
@@ -83,8 +95,18 @@ export const useTranslationWorkbench = () => {
       await poll(result.id, runSequence)
     } catch (error) {
       if (runSequence !== sequence) return
+      const requestError = error as {
+        statusCode?: number
+        data?: { errors?: { source_text?: unknown[] } }
+      }
+
+      if (requestError.statusCode === 422 && requestError.data?.errors?.source_text) {
+        setLimitError()
+        return
+      }
+
       errorMessage.value =
-        (error as { statusCode?: number }).statusCode === 401
+        requestError.statusCode === 401
           ? 'Your session has expired. Please sign in again.'
           : 'Translation request failed.'
     }
@@ -92,7 +114,15 @@ export const useTranslationWorkbench = () => {
 
   const schedule = async () => {
     await cancelCurrent()
-    if (!sourceText.value.trim()) return
+    if (!sourceText.value.trim()) {
+      errorMessage.value = null
+      return
+    }
+    if (sourceText.value.trim().length > inputCharacterLimit.value) {
+      setLimitError()
+      return
+    }
+    errorMessage.value = null
     debounceTimer = setTimeout(() => void translate(), 650)
   }
 
@@ -103,6 +133,7 @@ export const useTranslationWorkbench = () => {
     current,
     isBusy,
     errorMessage,
+    inputCharacterLimit,
     schedule,
     cancelCurrent,
     translate,

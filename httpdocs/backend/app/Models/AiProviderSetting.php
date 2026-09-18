@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 
 class AiProviderSetting extends Model
 {
+	private int $default_max_input_characters;
+
 	protected $fillable = [
 		'key',
 		'name',
@@ -17,6 +18,13 @@ class AiProviderSetting extends Model
 		'is_default',
 		'configuration',
 	];
+
+	public function __construct(array $attributes = [])
+	{
+		parent::__construct($attributes);
+
+		$this->default_max_input_characters = (int)config('app.max_characters_for_input_translate', 500);
+	}
 
 	protected static function booted(): void
 	{
@@ -37,5 +45,14 @@ class AiProviderSetting extends Model
 			'is_default'    => 'boolean',
 			'configuration' => 'encrypted:array',
 		];
+	}
+
+	public function maxInputCharacters(): int
+	{
+		$limit = data_get($this->configuration, 'max_input_characters', $this->default_max_input_characters);
+
+		return is_numeric($limit)
+			? max(1, (int) $limit)
+			: $this->default_max_input_characters;
 	}
 }

@@ -50,14 +50,40 @@ class TranslationAuthenticationTest extends TestCase
             ->assertUnauthorized();
     }
 
-    private function enableProvider(): void
+    public function test_source_text_cannot_exceed_the_configured_provider_limit(): void
+    {
+        $user = User::factory()->create();
+        $this->enableProvider(['max_input_characters' => 5]);
+        Passport::actingAs($user, ['translate']);
+
+        $this->postJson('/api/v1/translation-requests', [
+            ...$this->payload(),
+            'source_text' => '123456',
+        ])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['source_text']);
+    }
+
+    public function test_authenticated_user_receives_the_configured_provider_limit(): void
+    {
+        $user = User::factory()->create();
+        $this->enableProvider(['max_input_characters' => 5]);
+        Passport::actingAs($user, ['profile']);
+
+        $this->getJson('/api/v1/me')
+            ->assertOk()
+            ->assertJsonPath('max_input_characters', 5);
+    }
+
+    /** @param array<string, int> $configuration */
+    private function enableProvider(array $configuration = []): void
     {
         AiProviderSetting::query()->create([
             'key' => 'openai',
             'name' => 'OpenAI',
             'enabled' => true,
             'is_default' => true,
-            'configuration' => ['api_key' => 'test-key', 'model' => 'gpt-5.6'],
+            'configuration' => ['api_key' => 'test-key', 'model' => 'gpt-5.6', ...$configuration],
         ]);
     }
 

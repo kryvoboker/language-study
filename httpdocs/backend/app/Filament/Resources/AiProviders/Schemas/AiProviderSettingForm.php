@@ -16,6 +16,8 @@ final class AiProviderSettingForm
 {
     public static function configure(Schema $schema): Schema
     {
+		$max_input_characters = (int)config('app.max_characters_for_input_translate', 500);
+
         return $schema->components([
             Section::make()
                 ->columnSpanFull()
@@ -78,6 +80,14 @@ final class AiProviderSettingForm
                                 ->integer()
                                 ->minValue(1)
                                 ->helperText('Limits the size of the generated translation and language feedback response.'),
+                            TextInput::make('configuration.max_input_characters')
+                                ->label('Maximum input characters')
+                                ->numeric()
+                                ->integer()
+                                ->minValue(1)
+                                ->maxValue($max_input_characters)
+                                ->default($max_input_characters)
+                                ->helperText('Limits how many characters a user can submit for one translation request.'),
                             TextInput::make('configuration.temperature')
                                 ->numeric()
                                 ->minValue(0)

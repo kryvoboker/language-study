@@ -20,7 +20,8 @@
     "result": "Meaning first",
     "empty": "Your translation will appear here.",
     "analyzing": "Analyzing language…",
-    "ready": "Ready"
+    "ready": "Ready",
+    "limitError": "Text exceeds the {limit} character limit."
   },
   "coach": {
     "natural": "Natural native-like version",
