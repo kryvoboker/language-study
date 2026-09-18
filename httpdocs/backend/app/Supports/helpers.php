@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use JetBrains\PhpStorm\Language;
+use Illuminate\Support\Facades\Log;
 
 if (!function_exists('string_value')) {
 	/**
@@ -135,21 +136,91 @@ if (!function_exists('resolve_public_url')) {
 	}
 }
 
+if (!function_exists('to_json')) {
+	/**
+	 * @param mixed $value
+	 * @param int   $flags
+	 * @param int   $depth
+	 *
+	 * @return string
+	 * @throws JsonException
+	 */
+	function to_json(
+		mixed $value,
+		int   $flags = 0,
+		int   $depth = 512
+	): string {
+		if (blank($value)) {
+			return '';
+		}
+
+		$json = json_encode($value, $flags | JSON_UNESCAPED_UNICODE, $depth);
+
+		// if you pass the JSON_THROW_ON_ERROR, so current condition doesn't work
+		if (json_last_error() !== JSON_ERROR_NONE) {
+			Log::channel('stack')->error(
+				"Failed encode to JSON!\nError: " . json_last_error_msg(),
+				log_stack_trace(),
+			);
+
+			return '';
+		}
+
+		return $json;
+	}
+}
+
+if (!function_exists('from_json')) {
+	/**
+	 * @param string    $json
+	 * @param bool|null $associative
+	 * @param int       $depth
+	 * @param int       $flags
+	 *
+	 * @return array|object
+	 * @throws JsonException
+	 */
+	function from_json(
+		#[Language("JSON")] string $json,
+		?bool                      $associative = true,
+		int                        $depth = 512,
+		int                        $flags = 0
+	): array|object {
+		if ($json === '') {
+			return [];
+		}
+
+		$data = json_decode($json, $associative, $depth, $flags);
+
+		// if you pass the JSON_THROW_ON_ERROR, so current condition doesn't work
+		if (json_last_error() !== JSON_ERROR_NONE) {
+			Log::channel('stack')->error(
+				"Failed decode JSON!\nError: " . json_last_error_msg(),
+				log_stack_trace(),
+			);
+
+			return [];
+		}
+
+		return $data;
+	}
+}
+
 if (!function_exists('json_encode_throw')) {
 	/**
 	 * @param mixed $value
 	 * @param int   $flags
 	 * @param int   $depth
 	 *
-	 * @return false|string
+	 * @return string
 	 * @throws JsonException
 	 */
 	function json_encode_throw(
 		mixed $value,
 		int   $flags = 0,
 		int   $depth = 512
-	): false|string {
-		return json_encode($value, $flags | JSON_THROW_ON_ERROR, $depth);
+	): string {
+		return to_json($value, $flags | JSON_THROW_ON_ERROR, $depth);
 	}
 }
 
@@ -160,7 +231,7 @@ if (!function_exists('json_decode_throw')) {
 	 * @param int       $depth
 	 * @param int       $flags
 	 *
-	 * @return mixed
+	 * @return array|object
 	 * @throws JsonException
 	 */
 	function json_decode_throw(
@@ -168,8 +239,8 @@ if (!function_exists('json_decode_throw')) {
 		?bool                      $associative = true,
 		int                        $depth = 512,
 		int                        $flags = 0
-	): mixed {
-		return json_decode($json, $associative, $depth, $flags | JSON_THROW_ON_ERROR);
+	): array|object {
+		return from_json($json, $associative, $depth, $flags | JSON_THROW_ON_ERROR);
 	}
 }
 
@@ -250,11 +321,11 @@ if (!function_exists('parse_telephone')) {
 	{
 		$telephone = clear_telephone($telephone, true);
 
-		$mask = '+38 (___) ___-__-__';
+		$mask         = '+38 (___) ___-__-__';
 		$phone_length = Str::length($telephone);
 
 		for ($index_number = 0; $index_number < $phone_length; $index_number++) {
-			$mask = (string) Str::replaceMatches('/_/', $telephone[$index_number], $mask, 1);
+			$mask = (string)Str::replaceMatches('/_/', $telephone[$index_number], $mask, 1);
 		}
 
 		return $mask;
@@ -276,5 +347,27 @@ if (!function_exists('trim_strs_in_arr')) {
 
 			return $item;
 		}, $arr);
+	}
+}
+
+if (!function_exists('log_stack_trace')) {
+	/**
+	 * @return array
+	 */
+	function log_stack_trace(): array
+	{
+		$stack_trace = debug_backtrace();
+		$log_message = [];
+
+		foreach ($stack_trace as $stack_frame) {
+			$file     = $stack_frame['file'] ?? '(no file)';
+			$line     = $stack_frame['line'] ?? '(no line)';
+			$function = $stack_frame['function'] ?? '(no function)';
+			$type     = $stack_frame['type'] ?? ' - ';
+
+			$log_message[] = sprintf("#%d %s:%s $type %s", $line, $file, $line, $function);
+		}
+
+		return $log_message;
 	}
 }

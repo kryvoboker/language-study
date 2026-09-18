@@ -34,8 +34,10 @@ Use these helpers at boundaries where input can have an unexpected type:
 
 | Function | Behavior |
 |----------|----------|
-| `json_encode_throw(mixed $value, int $flags = 0, int $depth = 512): false|string` | Encodes JSON with `JSON_THROW_ON_ERROR` added to the supplied flags. |
-| `json_decode_throw(string $json, ?bool $associative = true, int $depth = 512, int $flags = 0): mixed` | Decodes JSON with `JSON_THROW_ON_ERROR` added to the supplied flags. |
+| `json_encode_throw(mixed $value, int $flags = 0, int $depth = 512): string` | Encodes JSON with `JSON_THROW_ON_ERROR` added to the supplied flags. |
+| `json_decode_throw(string $json, ?bool $associative = true, int $depth = 512, int $flags = 0): array\|object` | Decodes JSON with `JSON_THROW_ON_ERROR` added to the supplied flags. |
+| `to_json(mixed $value, int $flags = 0, int $depth = 512): string` | Encodes JSON with `JSON_UNESCAPED_UNICODE` added to the supplied flags. And checking an error if doesn't pass the parameter `JSON_THROW_ON_ERROR` |
+| `from_json(string $json, ?bool $associative = true, int $depth = 512, int $flags = 0): array\|object` | Checking an error if doesn't pass the parameter `JSON_THROW_ON_ERROR` |
 
 Use the JSON helpers when malformed JSON must become an exception instead of being silently converted to `false` or `null`.
 

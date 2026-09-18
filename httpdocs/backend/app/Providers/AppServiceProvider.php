@@ -28,14 +28,14 @@ class AppServiceProvider extends ServiceProvider
             ]);
         }
 
-        $this->app->useStoragePath((string) env('NEW_STORAGE_PATH'));
+        $this->app->useStoragePath((string) config('filesystems.new_storage_path'));
     }
 
     public function boot(): void
     {
         require_once app_path('Supports/helpers.php');
 
-        URL::forceRootUrl((string) config('app.url'));
+        URL::useOrigin((string) config('app.url'));
         Passport::authorizationView('passport.authorize');
 
         Passport::tokensExpireIn(CarbonInterval::minutes(20));
@@ -44,7 +44,7 @@ class AppServiceProvider extends ServiceProvider
             'profile' => 'Read the authenticated profile',
             'translate' => 'Use translation features',
         ]);
-        Passport::setDefaultScope(['profile']);
+        Passport::defaultScopes(['profile']);
 
         Gate::before(static function (User $user): ?bool {
             return $user->hasRole('super_admin') ? true : null;
