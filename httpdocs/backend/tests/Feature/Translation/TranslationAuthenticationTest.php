@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Translation;
 
+use App\Enums\TranslationStatus;
 use App\Jobs\StartTranslationJob;
 use App\Models\AiProviderSetting;
+use App\Models\TranslationRequest;
 use App\Models\Users\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Queue;
@@ -88,6 +90,41 @@ class TranslationAuthenticationTest extends TestCase
         ])
             ->assertUnprocessable()
             ->assertJsonValidationErrors(['locale']);
+    }
+
+    public function test_completed_translation_is_reused_for_normalized_request_data(): void
+    {
+        Queue::fake();
+        $user = User::factory()->create();
+        $this->enableProvider();
+        TranslationRequest::query()->create([
+            'user_id' => User::factory()->create()->id,
+            'source_text' => 'Hello',
+            'source_language' => 'en',
+            'target_language' => 'uk',
+            'request_hash' => TranslationRequest::generateRequestHash(' Hello ', 'EN', 'uk'),
+            'locale' => 'en',
+            'status' => TranslationStatus::Completed,
+            'result' => ['translation' => 'Привіт'],
+            'completed_at' => now(),
+        ]);
+        Passport::actingAs($user, ['translate']);
+
+        $this->postJson('/api/v1/translation-requests', [
+            ...$this->payload(),
+            'source_text' => '  HELLO  ',
+            'source_language' => 'EN',
+        ])
+            ->assertOk()
+            ->assertJsonPath('status', TranslationStatus::Completed->value)
+            ->assertJsonPath('translation', 'Привіт');
+
+        Queue::assertNothingPushed();
+        $this->assertDatabaseHas('translation_requests', [
+            'user_id' => $user->id,
+            'request_hash' => TranslationRequest::generateRequestHash('Hello', 'en', 'uk'),
+            'status' => TranslationStatus::Completed->value,
+        ]);
     }
 
     /** @param array<string, int> $configuration */

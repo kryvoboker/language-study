@@ -9,6 +9,7 @@ use App\Models\Users\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class VerifyEmailController extends Controller
 {
@@ -23,6 +24,6 @@ class VerifyEmailController extends Controller
             Log::channel('stack')->info('Email address verified', ['user_id' => $user->getKey()]);
         }
 
-        return redirect(Str::rtrim((string) config('app.frontend_url'), '/') . '/login?verified=1');
+        return redirect(Str::rtrim(string_value(config('app.frontend_url')), '/') . '/login?verified=1');
     }
 }

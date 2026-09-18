@@ -15,14 +15,16 @@ use Illuminate\Support\Str;
 
 class ResetPasswordController extends Controller
 {
-	public function __invoke(Request $request): JsonResponse
-	{
-		$data   = $request->validate(['token' => ['required'], 'email' => ['required', 'email'], 'password' => ['required', 'confirmed', 'min:10']]);
-		$status = Password::reset($data, function (User $user, string $password): void {
-			$user->forceFill(['password' => Hash::make($password), 'remember_token' => Str::random(60)])->save();
-			event(new PasswordReset($user));
-		});
-		abort_if($status !== Password::PasswordReset, 422, __($status));
-		return response()->json(['message' => __($status)]);
-	}
+    public function __invoke(Request $request): JsonResponse
+    {
+        /** @var array{token: string, email: string, password: string} $data */
+        $data = $request->validate(['token' => ['required'], 'email' => ['required', 'email'], 'password' => ['required', 'confirmed', 'min:10']]);
+        $status = Password::reset($data, function (User $user, string $password): void {
+            $user->forceFill(['password' => Hash::make($password), 'remember_token' => Str::random(60)])->save();
+            event(new PasswordReset($user));
+        });
+        $status_key = string_value($status);
+        abort_if($status_key !== Password::PasswordReset, 422, __($status_key));
+        return response()->json(['message' => __($status_key)]);
+    }
 }

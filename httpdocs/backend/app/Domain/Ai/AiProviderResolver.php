@@ -10,22 +10,22 @@ use RuntimeException;
 
 final class AiProviderResolver
 {
-	public function resolveFor(User $user): AiProviderSetting
-	{
-		if ($user->ai_provider_id !== null) {
-			$override = AiProviderSetting::query()
-				->whereKey($user->ai_provider_id)
-				->where('enabled', true)
-				->first();
-			if ($override !== null) {
-				return $override;
-			}
-		}
+    public function resolveFor(User $user): AiProviderSetting
+    {
+        if ($user->ai_provider_id > 0) {
+            $override = AiProviderSetting::query()
+                ->whereKey($user->ai_provider_id)
+                ->where('enabled', true)
+                ->first();
+            if ($override !== null) {
+                return $override;
+            }
+        }
 
-		return AiProviderSetting::query()
-			->where('enabled', true)
-			->orderByDesc('is_default')
-			->first()
-			?? throw new RuntimeException('No enabled AI provider is configured.');
-	}
+        return AiProviderSetting::query()
+            ->where('enabled', true)
+            ->orderByDesc('is_default')
+            ->first()
+            ?? throw new RuntimeException('No enabled AI provider is configured.');
+    }
 }

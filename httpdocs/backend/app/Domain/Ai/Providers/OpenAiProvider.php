@@ -16,184 +16,193 @@ use OpenAI;
 
 final class OpenAiProvider implements AiProviderContract
 {
-	/**
-	 * @param AiProviderSetting     $setting
-	 * @param TranslationPromptData $data
-	 *
-	 * @return ProviderOperationData
-	 * @throws JsonException
-	 */
-	public function start(AiProviderSetting $setting, TranslationPromptData $data): ProviderOperationData
-	{
-		$configuration = $this->configuration($setting);
-		$client        = OpenAI::client($configuration['api_key']);
+    /**
+     * @param AiProviderSetting     $setting
+     * @param TranslationPromptData $data
+     *
+     * @throws JsonException
+     * @return ProviderOperationData
+     */
+    public function start(AiProviderSetting $setting, TranslationPromptData $data): ProviderOperationData
+    {
+        $configuration = $this->configuration($setting);
+        $client = OpenAI::client($configuration['api_key']);
 
-		$response = $client->responses()->create([
-			'model'        => $configuration['model'],
-			...$configuration['request'],
-			'instructions' => $this->instructions($setting, $data->locale),
-			'input'        => [
-				[
-					'role'    => 'user',
-					'content' => [
-						[
-							'type' => 'input_text',
-							'text' => json_encode_throw([
-								'source_language' => $data->source_language,
-								'target_language' => $data->target_language,
-								'text'            => $data->text,
-							], JSON_UNESCAPED_UNICODE),
-						]
-					],
-				]
-			],
-			'text'         => [
-				'format' => [
-					'type'   => 'json_schema',
-					'name'   => 'language_review',
-					'strict' => true,
-					'schema' => $this->schema(),
-				],
-			],
-		]);
+        $response = $client->responses()->create([
+            'model' => $configuration['model'],
+            ...$configuration['request'],
+            'instructions' => $this->instructions($setting, $data->locale),
+            'input' => [
+                [
+                    'role' => 'user',
+                    'content' => [
+                        [
+                            'type' => 'input_text',
+                            'text' => json_encode_throw([
+                                'source_language' => $data->source_language,
+                                'target_language' => $data->target_language,
+                                'text' => $data->text,
+                            ], JSON_UNESCAPED_UNICODE),
+                        ],
+                    ],
+                ],
+            ],
+            'text' => [
+                'format' => [
+                    'type' => 'json_schema',
+                    'name' => 'language_review',
+                    'strict' => true,
+                    'schema' => $this->schema(),
+                ],
+            ],
+        ]);
 
-		return new ProviderOperationData($response->id, (string)$response->status);
-	}
+        return new ProviderOperationData($response->id, (string)$response->status);
+    }
 
-	/**
-	 * @param AiProviderSetting $setting
-	 * @param string            $operation_id
-	 *
-	 * @return ProviderResultData
-	 * @throws JsonException
-	 */
-	public function retrieve(AiProviderSetting $setting, string $operation_id): ProviderResultData
-	{
-		$client   = OpenAI::client($this->configuration($setting)['api_key']);
-		$response = $client->responses()->retrieve($operation_id);
-		$status   = $response->status;
+    /**
+     * @param AiProviderSetting $setting
+     * @param string            $operation_id
+     *
+     * @throws JsonException
+     * @return ProviderResultData
+     */
+    public function retrieve(AiProviderSetting $setting, string $operation_id): ProviderResultData
+    {
+        $client = OpenAI::client($this->configuration($setting)['api_key']);
+        $response = $client->responses()->retrieve($operation_id);
+        $status = $response->status;
 
-		if ($status !== 'completed') {
-			return new ProviderResultData($status, error: $response->error?->message ?? null);
-		}
+        if ($status !== 'completed') {
+            return new ProviderResultData($status, error: $response->error->message ?? null);
+        }
 
-		$decoded = json_decode_throw($response->outputText);
-		return new ProviderResultData($status, $decoded);
-	}
+        if (! is_string($response->outputText)) {
+            return new ProviderResultData($status, error: 'The AI provider returned an empty response.');
+        }
 
-	public function cancel(AiProviderSetting $setting, string $operation_id): void
-	{
-		$client = OpenAI::client($this->configuration($setting)['api_key']);
-		$client->responses()->cancel($operation_id);
-	}
+        $decoded = json_decode_throw($response->outputText);
+        /** @var array<string, mixed>|null $result */
+        $result = is_array($decoded) ? $decoded : null;
 
-	/**
-	 * @return array{api_key: string, model: string, request: array<string, mixed>}
-	 */
-	private function configuration(AiProviderSetting $setting): array
-	{
-		$configuration = $setting->configuration ?? [];
-		$apiKey        = $configuration['api_key'] ?? null;
+        return new ProviderResultData($status, $result);
+    }
 
-		if (!is_string($apiKey) || blank($apiKey)) {
-			throw new InvalidArgumentException("AI provider [$setting->key] has no API key configured.");
-		}
+    public function cancel(AiProviderSetting $setting, string $operation_id): void
+    {
+        $client = OpenAI::client($this->configuration($setting)['api_key']);
+        $client->responses()->cancel($operation_id);
+    }
 
-		$model = blank($configuration['model'] ?? null)
-			? Str::trim((string)config('ai.providers.openai.default_model', 'gpt-5-nano'))
-			: Str::trim($configuration['model']);
+    /**
+     * @return array{api_key: string, model: string, request: array<string, mixed>}
+     */
+    private function configuration(AiProviderSetting $setting): array
+    {
+        $configuration = is_array($setting->configuration) ? $setting->configuration : [];
+        $apiKey = $configuration['api_key'] ?? null;
 
-		$request = [
-			'background' => true,
-			'store'      => true,
-		];
+        if (!is_string($apiKey) || blank($apiKey)) {
+            throw new InvalidArgumentException("AI provider [$setting->key] has no API key configured.");
+        }
 
-		foreach (['background', 'store'] as $key) {
-			if (array_key_exists($key, $configuration) && is_bool($configuration[$key])) {
-				$request[$key] = $configuration[$key];
-			}
-		}
+        $configured_model = $configuration['model'] ?? null;
+        $model = is_string($configured_model) && Str::trim($configured_model) !== ''
+            ? Str::trim($configured_model)
+            : Str::trim(string_value(config('ai.providers.openai.default_model', 'gpt-5-nano')));
 
-		$key = 'max_output_tokens';
+        $request = [
+            'background' => true,
+            'store' => true,
+        ];
 
-		if (array_key_exists($key, $configuration) && is_numeric($configuration[$key])) {
-			$value = (int)$configuration[$key];
+        foreach (['background', 'store'] as $key) {
+            if (array_key_exists($key, $configuration) && is_bool($configuration[$key])) {
+                $request[$key] = $configuration[$key];
+            }
+        }
 
-			if ($value > 0) {
-				$request[$key] = $value;
-			}
-		}
+        $key = 'max_output_tokens';
 
-		$key = 'temperature';
+        if (array_key_exists($key, $configuration) && is_numeric($configuration[$key])) {
+            $value = (int)$configuration[$key];
 
-		if (array_key_exists($key, $configuration) && is_numeric($configuration[$key])) {
-			$request[$key] = (float)$configuration[$key];
-		}
+            if ($value > 0) {
+                $request[$key] = $value;
+            }
+        }
 
-		$key = 'service_tier';
+        $key = 'temperature';
 
-		if (is_string($configuration[$key] ?? null) && Str::trim($configuration[$key]) !== '') {
-			$request[$key] = $configuration[$key];
-		}
+        if (array_key_exists($key, $configuration) && is_numeric($configuration[$key])) {
+            $request[$key] = (float)$configuration[$key];
+        }
 
-		$reasoning = [];
+        $key = 'service_tier';
 
-		foreach (['effort', 'summary', 'mode'] as $key) {
-			$configurationKey = "reasoning_$key";
+        if (is_string($configuration[$key] ?? null) && Str::trim($configuration[$key]) !== '') {
+            $request[$key] = $configuration[$key];
+        }
 
-			if (is_string($configuration[$configurationKey] ?? null) && Str::trim($configuration[$configurationKey]) !== '') {
-				$reasoning[$key] = $configuration[$configurationKey];
-			}
-		}
+        $reasoning = [];
 
-		if ($reasoning !== []) {
-			$request['reasoning'] = $reasoning;
-		}
+        foreach (['effort', 'summary', 'mode'] as $key) {
+            $configurationKey = "reasoning_$key";
 
-		return [
-			'api_key' => $apiKey,
-			'model'   => $model,
-			'request' => $request,
-		];
-	}
+            if (is_string($configuration[$configurationKey] ?? null) && Str::trim($configuration[$configurationKey]) !== '') {
+                $reasoning[$key] = $configuration[$configurationKey];
+            }
+        }
 
-	private function instructions(AiProviderSetting $setting, string $locale): string
-	{
-		$instructions = is_string($setting->prompt_instruction) && Str::trim($setting->prompt_instruction) !== ''
-			? $setting->prompt_instruction
-			: <<<'PROMPT'
+        if ($reasoning !== []) {
+            $request['reasoning'] = $reasoning;
+        }
+
+        return [
+            'api_key' => $apiKey,
+            'model' => $model,
+            'request' => $request,
+        ];
+    }
+
+    private function instructions(AiProviderSetting $setting, string $locale): string
+    {
+        $instructions = is_string($setting->prompt_instruction) && Str::trim($setting->prompt_instruction) !== ''
+            ? $setting->prompt_instruction
+            : <<<'PROMPT'
 You are a translation engine and language coach. Return only schema-valid JSON.
 Translate faithfully into the requested target language. Independently evaluate the source text for grammar, spelling, punctuation and unnatural phrasing. Provide one corrected source version, one natural native-like target version, and concise educational issues. Do not invent errors. Preserve names, URLs, code, numbers and intended tone.
 PROMPT;
 
-		return Str::finish($instructions, "\n") . "Provide error messages to the user only in $locale.";
-	}
+        return Str::finish($instructions, "\n") . "Provide error messages to the user only in $locale.";
+    }
 
-	private function schema(): array
-	{
-		return [
-			'type'                 => 'object',
-			'additionalProperties' => false,
-			'required'             => ['translation', 'source_corrected', 'natural_version', 'issues'],
-			'properties'           => [
-				'translation'      => ['type' => 'string'],
-				'source_corrected' => ['type' => 'string'],
-				'natural_version'  => ['type' => 'string'],
-				'issues'           => [
-					'type'  => 'array',
-					'items' => [
-						'type'       => 'object', 'additionalProperties' => false,
-						'required'   => ['type', 'original', 'correction', 'explanation', 'severity'],
-						'properties' => [
-							'type'        => ['type' => 'string'],
-							'original'    => ['type' => 'string'],
-							'correction'  => ['type' => 'string'],
-							'explanation' => ['type' => 'string'],
-							'severity'    => ['type' => 'string', 'enum' => ['info', 'warning', 'error']],
-						],
-					],
-				],
-			],
-		];
-	}
+    /** @return array<string, mixed> */
+    private function schema(): array
+    {
+        return [
+            'type' => 'object',
+            'additionalProperties' => false,
+            'required' => ['translation', 'source_corrected', 'natural_version', 'issues'],
+            'properties' => [
+                'translation' => ['type' => 'string'],
+                'source_corrected' => ['type' => 'string'],
+                'natural_version' => ['type' => 'string'],
+                'issues' => [
+                    'type' => 'array',
+                    'items' => [
+                        'type' => 'object', 'additionalProperties' => false,
+                        'required' => ['type', 'original', 'correction', 'explanation', 'severity'],
+                        'properties' => [
+                            'type' => ['type' => 'string'],
+                            'original' => ['type' => 'string'],
+                            'correction' => ['type' => 'string'],
+                            'explanation' => ['type' => 'string'],
+                            'severity' => ['type' => 'string', 'enum' => ['info', 'warning', 'error']],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+    }
 }

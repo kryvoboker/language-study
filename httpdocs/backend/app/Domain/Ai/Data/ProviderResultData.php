@@ -6,6 +6,7 @@ namespace App\Domain\Ai\Data;
 
 final readonly class ProviderResultData
 {
+    /** @param array<string, mixed>|null $result */
     public function __construct(public string $status, public ?array $result = null, public ?string $error = null)
     {
     }

@@ -24,6 +24,7 @@ class PollTranslationJob implements ShouldQueue
 
     public function handle(AiProviderManager $manager): void
     {
+        /** @var TranslationRequest $request */
         $request = TranslationRequest::query()->findOrFail($this->translation_request_id);
         if ($request->status->isTerminal() || $request->provider_operation_id === null || $request->provider_key === null) {
             return;

@@ -47,4 +47,10 @@ return [
 
     'connection' => env('PASSPORT_CONNECTION'),
 
+    'public_client_name' => env('PASSPORT_PUBLIC_CLIENT_NAME', 'NativeLens Storefront'),
+
+    'public_client_redirect_uri' => env('PASSPORT_PUBLIC_CLIENT_REDIRECT_URI'),
+
+    'personal_client_name' => env('PASSPORT_PERSONAL_CLIENT_NAME', 'NativeLens Storefront Personal'),
+
 ];

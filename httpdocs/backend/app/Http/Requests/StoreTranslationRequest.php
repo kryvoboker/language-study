@@ -16,9 +16,10 @@ class StoreTranslationRequest extends FormRequest
         return true;
     }
 
+    /** @return array<string, array<int, mixed>> */
     public function rules(): array
     {
-		$max_input_characters = (int)config('app.max_characters_for_input_translate', 12000);
+        $max_input_characters = integer_value(config('app.max_characters_for_input_translate', 12000));
 
         if ($this->user() instanceof User) {
             try {

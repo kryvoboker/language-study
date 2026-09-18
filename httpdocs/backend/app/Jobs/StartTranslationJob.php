@@ -24,12 +24,15 @@ class StartTranslationJob implements ShouldQueue
 
     public function handle(AiProviderResolver $resolver, AiProviderManager $manager): void
     {
+        /** @var TranslationRequest $request */
         $request = TranslationRequest::query()->with('user')->findOrFail($this->translation_request_id);
+        /** @var \App\Models\Users\User $user */
+        $user = $request->user;
         if ($request->status === TranslationStatus::Cancelled) {
             return;
         }
 
-        $setting = $resolver->resolveFor($request->user);
+        $setting = $resolver->resolveFor($user);
         $request->update(['status' => TranslationStatus::Processing, 'provider_key' => $setting->key]);
 
         try {

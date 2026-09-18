@@ -12,4 +12,6 @@ Route::get('/auth/social/{provider}/callback', [SocialAuthController::class, 'ca
 Route::view('/login', 'auth.login')->name('login');
 Route::post('/login', [WebLoginController::class, 'store'])->name('login.store');
 Route::get('/email/verify/{id}/{hash}', VerifyEmailController::class)->middleware('signed')->name('verification.verify');
-Route::view('/docs/api', 'swagger')->name('docs.api');
+/** @var view-string $swagger_view */
+$swagger_view = 'swagger';
+Route::view('/docs/api', $swagger_view)->name('docs.api');

@@ -10,11 +10,12 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
+use Symfony\Component\HttpFoundation\RedirectResponse as SymfonyRedirectResponse;
 
 class SocialAuthController extends Controller
 {
     private const PROVIDERS = ['google', 'github', 'facebook'];
-    public function redirect(string $provider): RedirectResponse
+    public function redirect(string $provider): SymfonyRedirectResponse
     {
         abort_unless(in_array($provider, self::PROVIDERS, true), 404);
         return Socialite::driver($provider)->redirect();
@@ -35,6 +36,6 @@ class SocialAuthController extends Controller
         abort_if($user->is_blocked, 403);
         $ticket = Str::random(64);
         Cache::put('social-login:' . hash('sha256', $ticket), $user->id, now()->addMinute());
-        return redirect(Str::rtrim((string) config('app.frontend_url'), '/') . '/auth/social/callback?ticket=' . urlencode($ticket));
+        return redirect(Str::rtrim(string_value(config('app.frontend_url')), '/') . '/auth/social/callback?ticket=' . urlencode($ticket));
     }
 }

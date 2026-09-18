@@ -10,7 +10,11 @@ return new class () extends Migration {
     {
         Schema::create('translation_requests', function (Blueprint $table): void {
             $table->uuid('id')->primary();
+
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+			$table->char('request_hash', 64)
+				->nullable(false)
+				->index();
             $table->longText('source_text');
             $table->string('source_language', 12);
             $table->string('target_language', 12);
@@ -23,6 +27,7 @@ return new class () extends Migration {
             $table->timestamp('cancelled_at')->nullable();
             $table->timestamp('completed_at')->nullable();
             $table->timestamps();
+
             $table->index(['user_id', 'created_at']);
         });
     }

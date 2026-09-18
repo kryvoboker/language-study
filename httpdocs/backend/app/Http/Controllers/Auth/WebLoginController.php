@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\Users\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -13,6 +14,7 @@ class WebLoginController extends Controller
 {
     public function store(Request $request): RedirectResponse
     {
+        /** @var array{email: string, password: string} $credentials */
         $credentials = $request->validate([
             'email' => ['required', 'email'],
             'password' => ['required', 'string'],
@@ -24,7 +26,9 @@ class WebLoginController extends Controller
 
         $request->session()->regenerate();
 
-        if (! $request->user()->hasVerifiedEmail()) {
+        $user = $request->user();
+
+        if (! $user instanceof User || ! $user->hasVerifiedEmail()) {
             Auth::guard('web')->logout();
 
             return back()->withErrors(['email' => 'Please verify your email address first.'])->onlyInput('email');

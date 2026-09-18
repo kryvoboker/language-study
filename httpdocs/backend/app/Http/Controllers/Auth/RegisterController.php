@@ -15,6 +15,7 @@ class RegisterController extends Controller
 {
     public function __invoke(Request $request): JsonResponse
     {
+        /** @var array{name: string, email: string, password: string, password_confirmation?: string} $validated */
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:120'],
             'email' => ['required', 'email', 'max:255', 'unique:users,email'],

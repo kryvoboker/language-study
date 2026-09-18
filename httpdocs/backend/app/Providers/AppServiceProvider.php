@@ -28,14 +28,14 @@ class AppServiceProvider extends ServiceProvider
             ]);
         }
 
-        $this->app->useStoragePath((string) config('filesystems.new_storage_path'));
+        $this->app->useStoragePath(string_value(config('filesystems.new_storage_path')));
     }
 
     public function boot(): void
     {
         require_once app_path('Supports/helpers.php');
 
-        URL::useOrigin((string) config('app.url'));
+        URL::useOrigin(string_value(config('app.url')));
         Passport::authorizationView('passport.authorize');
 
         Passport::tokensExpireIn(CarbonInterval::minutes(20));

@@ -14,6 +14,7 @@ class LoginController extends Controller
 {
     public function __invoke(Request $request): JsonResponse
     {
+        /** @var array{email: string, password: string} $data */
         $data = $request->validate(['email' => ['required','email'], 'password' => ['required','string']]);
         $user = User::query()->where('email', $data['email'])->first();
         if ($user === null || $user->is_blocked || ! Hash::check($data['password'], (string) $user->password)) {
