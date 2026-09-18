@@ -31,7 +31,7 @@ final class OpenAiProvider implements AiProviderContract
         $response = $client->responses()->create([
             'model' => $configuration['model'],
             ...$configuration['request'],
-            'instructions' => $this->instructions($setting),
+            'instructions' => $this->instructions($setting, $data->locale),
             'input' => [[
                 'role' => 'user',
                 'content' => [[
@@ -151,16 +151,16 @@ final class OpenAiProvider implements AiProviderContract
         ];
     }
 
-    private function instructions(AiProviderSetting $setting): string
+    private function instructions(AiProviderSetting $setting, string $locale): string
     {
-        if (is_string($setting->prompt_instruction) && Str::trim($setting->prompt_instruction) !== '') {
-            return $setting->prompt_instruction;
-        }
-
-        return <<<'PROMPT'
+        $instructions = is_string($setting->prompt_instruction) && Str::trim($setting->prompt_instruction) !== ''
+            ? $setting->prompt_instruction
+            : <<<'PROMPT'
 You are a translation engine and language coach. Return only schema-valid JSON.
 Translate faithfully into the requested target language. Independently evaluate the source text for grammar, spelling, punctuation and unnatural phrasing. Provide one corrected source version, one natural native-like target version, and concise educational issues. Do not invent errors. Preserve names, URLs, code, numbers and intended tone.
 PROMPT;
+
+        return Str::finish($instructions, "\n") . "Provide error messages to the user only in {$locale}.";
     }
 
     private function schema(): array

@@ -34,6 +34,7 @@ class StoreTranslationRequest extends FormRequest
             'source_text' => ['required', 'string', 'max:' . $max_input_characters],
             'source_language' => ['required', 'string', 'max:12'],
             'target_language' => ['required', 'string', 'max:12', 'different:source_language'],
+            'locale' => ['required', 'string', 'in:en,uk,ru'],
         ];
     }
 }

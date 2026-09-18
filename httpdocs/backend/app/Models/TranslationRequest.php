@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Enums\TranslationStatus;
 use App\Models\Users\User;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -19,6 +20,7 @@ class TranslationRequest extends Model
 		'source_text',
 		'source_language',
 		'target_language',
+		'locale',
 		'status',
 		'provider_key',
 		'provider_operation_id',
@@ -36,6 +38,15 @@ class TranslationRequest extends Model
 			'cancelled_at' => 'datetime',
 			'completed_at' => 'datetime',
 		];
+	}
+
+	public function result(): Attribute
+	{
+		return Attribute::make(
+			set: static fn (mixed $value): mixed => is_array($value)
+				? to_json($value)
+				: $value,
+		);
 	}
 
 	/**

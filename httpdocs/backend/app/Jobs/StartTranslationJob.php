@@ -37,6 +37,7 @@ class StartTranslationJob implements ShouldQueue
                 $request->source_text,
                 $request->source_language,
                 $request->target_language,
+                $request->locale,
             ));
 
             $request->refresh();

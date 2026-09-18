@@ -13,11 +13,14 @@ return new class () extends Migration {
     {
         Schema::create('ai_provider_settings', function (Blueprint $table): void {
             $table->id();
+
             $table->string('key')->unique();
             $table->string('name');
+			$table->longText('prompt_instruction')->nullable();
             $table->boolean('enabled')->default(false);
             $table->boolean('is_default')->default(false);
             $table->longText('configuration');
+
             $table->timestamps();
         });
         Schema::table('users', function (Blueprint $table): void {

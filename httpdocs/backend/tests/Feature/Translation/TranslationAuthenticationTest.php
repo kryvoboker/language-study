@@ -27,6 +27,7 @@ class TranslationAuthenticationTest extends TestCase
             ->assertAccepted();
 
         Queue::assertPushed(StartTranslationJob::class);
+        $this->assertDatabaseHas('translation_requests', ['locale' => 'ru']);
     }
 
     public function test_verified_filament_session_user_can_create_a_translation_request_with_csrf(): void
@@ -75,6 +76,20 @@ class TranslationAuthenticationTest extends TestCase
             ->assertJsonPath('max_input_characters', 5);
     }
 
+    public function test_translation_locale_must_be_supported(): void
+    {
+        $user = User::factory()->create();
+        $this->enableProvider();
+        Passport::actingAs($user, ['translate']);
+
+        $this->postJson('/api/v1/translation-requests', [
+            ...$this->payload(),
+            'locale' => 'de',
+        ])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['locale']);
+    }
+
     /** @param array<string, int> $configuration */
     private function enableProvider(array $configuration = []): void
     {
@@ -94,6 +109,7 @@ class TranslationAuthenticationTest extends TestCase
             'source_text' => 'Hello',
             'source_language' => 'en',
             'target_language' => 'uk',
+            'locale' => 'ru',
         ];
     }
 }

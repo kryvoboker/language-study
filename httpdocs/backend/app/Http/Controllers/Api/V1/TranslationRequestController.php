@@ -23,6 +23,7 @@ class TranslationRequestController extends Controller
             'source_text' => $request->string('source_text')->toString(),
             'source_language' => $request->string('source_language')->toString(),
             'target_language' => $request->string('target_language')->toString(),
+            'locale' => $request->string('locale')->toString(),
             'status' => TranslationStatus::Queued,
         ]);
 

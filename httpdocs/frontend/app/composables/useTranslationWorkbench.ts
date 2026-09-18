@@ -1,7 +1,7 @@
 import type { TranslationRequestDto } from '#shared/types/translation'
 
 export const useTranslationWorkbench = () => {
-  const { t } = useI18n()
+  const { t, locale } = useI18n()
   const { user } = useAuth()
   const sourceText = ref('')
   const sourceLanguage = ref('en')
@@ -88,6 +88,7 @@ export const useTranslationWorkbench = () => {
           source_text: text,
           source_language: sourceLanguage.value,
           target_language: targetLanguage.value,
+          locale: locale.value,
         },
       })
       if (runSequence !== sequence) return
