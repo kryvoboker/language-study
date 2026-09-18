@@ -91,7 +91,7 @@ final class NamingConventionSniff implements Sniff
     private function checkVariable(File $file, int $ptr): void
     {
         $tokens = $file->getTokens();
-        $name = ltrim($tokens[$ptr]['content'], '$');
+        $name = Str::ltrim($tokens[$ptr]['content'], '$');
 
         if (in_array($name, self::ALLOWED_VARIABLES, true)) {
             return;

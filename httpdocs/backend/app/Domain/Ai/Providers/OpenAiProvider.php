@@ -9,11 +9,20 @@ use App\Domain\Ai\Data\ProviderOperationData;
 use App\Domain\Ai\Data\ProviderResultData;
 use App\Domain\Translation\Data\TranslationPromptData;
 use App\Models\AiProviderSetting;
+use Illuminate\Support\Str;
 use InvalidArgumentException;
+use JsonException;
 use OpenAI;
 
 final class OpenAiProvider implements AiProviderContract
 {
+	/**
+	 * @param AiProviderSetting     $setting
+	 * @param TranslationPromptData $data
+	 *
+	 * @return ProviderOperationData
+	 * @throws JsonException
+	 */
     public function start(AiProviderSetting $setting, TranslationPromptData $data): ProviderOperationData
     {
         $configuration = $this->configuration($setting);
@@ -28,11 +37,11 @@ final class OpenAiProvider implements AiProviderContract
                 'role' => 'user',
                 'content' => [[
                     'type' => 'input_text',
-                    'text' => json_encode([
+                    'text' => json_encode_throw([
                         'source_language' => $data->source_language,
                         'target_language' => $data->target_language,
                         'text' => $data->text,
-                    ], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR),
+                    ], JSON_UNESCAPED_UNICODE),
                 ]],
             ]],
             'text' => [
@@ -48,17 +57,24 @@ final class OpenAiProvider implements AiProviderContract
         return new ProviderOperationData($response->id, (string) $response->status);
     }
 
+	/**
+	 * @param AiProviderSetting $setting
+	 * @param string            $operation_id
+	 *
+	 * @return ProviderResultData
+	 * @throws JsonException
+	 */
     public function retrieve(AiProviderSetting $setting, string $operation_id): ProviderResultData
     {
         $client = OpenAI::client($this->configuration($setting)['api_key']);
         $response = $client->responses()->retrieve($operation_id);
-        $status = (string) $response->status;
+        $status = $response->status;
 
         if ($status !== 'completed') {
             return new ProviderResultData($status, error: $response->error?->message ?? null);
         }
 
-        $decoded = json_decode($response->outputText, true, flags: JSON_THROW_ON_ERROR);
+        $decoded = json_decode_throw($response->outputText);
         return new ProviderResultData($status, $decoded);
     }
 
@@ -74,21 +90,21 @@ final class OpenAiProvider implements AiProviderContract
         $configuration = $setting->configuration ?? [];
         $apiKey = $configuration['api_key'] ?? null;
 
-        if (! is_string($apiKey) || trim($apiKey) === '') {
-            throw new InvalidArgumentException("AI provider [{$setting->key}] has no API key configured.");
+        if (! is_string($apiKey) || Str::trim($apiKey) === '') {
+            throw new InvalidArgumentException("AI provider [$setting->key] has no API key configured.");
         }
 
-        $model = $configuration['model'] ?? 'gpt-5.6';
+        $model = $configuration['model'] ?? 'gpt-5.6-luna';
 
         return [
             'api_key' => $apiKey,
-            'model' => is_string($model) && trim($model) !== '' ? $model : 'gpt-5.6',
+            'model' => is_string($model) && Str::trim($model) !== '' ? $model : 'gpt-5.6-luna',
         ];
     }
 
     private function instructions(AiProviderSetting $setting): string
     {
-        if (is_string($setting->prompt_instruction) && trim($setting->prompt_instruction) !== '') {
+        if (is_string($setting->prompt_instruction) && Str::trim($setting->prompt_instruction) !== '') {
             return $setting->prompt_instruction;
         }
 

@@ -39,7 +39,7 @@ final class XHProfExtensionUnitTestEngine extends ArcanistUnitTestEngine {
           $result = ArcanistUnitTestResult::RESULT_FAIL;
         }
 
-        $name = trim($matches[2]);
+        $name = Str::trim($matches[2]);
 
         $tests[] = id(new ArcanistUnitTestResult())
           ->setName($name)

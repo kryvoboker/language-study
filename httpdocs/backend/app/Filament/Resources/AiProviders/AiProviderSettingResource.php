@@ -8,18 +8,13 @@ use App\Filament\Navigation\AdminNavigationGroupEnum;
 use App\Filament\Resources\AiProviders\Pages\CreateAiProviderSetting;
 use App\Filament\Resources\AiProviders\Pages\EditAiProviderSetting;
 use App\Filament\Resources\AiProviders\Pages\ListAiProviderSettings;
+use App\Filament\Resources\AiProviders\Schemas\AiProviderSettingForm;
+use App\Filament\Resources\AiProviders\Tables\AiProviderSettingTable;
 use App\Models\AiProviderSetting;
 use BackedEnum;
-use Filament\Actions\EditAction;
-use Filament\Forms\Components\KeyValue;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
-use Filament\Tables\Columns\IconColumn;
-use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use UnitEnum;
 
@@ -29,43 +24,15 @@ class AiProviderSettingResource extends Resource
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCpuChip;
     protected static string|null|UnitEnum   $navigationGroup = AdminNavigationGroupEnum::AiProviders;
 
-    public static function form(Schema $schema): Schema
-    {
-        return $schema->components([
-            TextInput::make('name')->required(),
-            Textarea::make('prompt_instruction')
-                ->label('Prompt instruction')
-                ->helperText('Instructions sent to the AI assistant for this provider. This replaces the default system prompt.')
-                ->required()
-                ->rows(8)
-                ->columnSpanFull(),
-            TextInput::make('key')
-                ->required()
-                ->alphaDash()
-                ->unique(ignoreRecord: true)
-                ->disabledOn('edit')
-                ->dehydrated(),
-            Toggle::make('enabled'),
-            Toggle::make('is_default'),
-            KeyValue::make('configuration')
-                ->keyLabel('Setting')
-                ->valueLabel('Value')
-                ->helperText('Encrypted at rest. Provider-specific typed pages can replace this generic editor as integrations are added.'),
-        ]);
-    }
+	public static function form(Schema $schema): Schema
+	{
+		return AiProviderSettingForm::configure($schema);
+	}
 
-    public static function table(Table $table): Table
-    {
-        return $table->columns(
-            [
-                TextColumn::make('name'),
-                TextColumn::make('key')->badge(),
-                IconColumn::make('enabled')->boolean(),
-                IconColumn::make('is_default')->boolean(),
-            ],
-        )
-            ->recordActions([EditAction::make()]);
-    }
+	public static function table(Table $table): Table
+	{
+		return AiProviderSettingTable::configure($table);
+	}
 
     public static function getPages(): array
     {

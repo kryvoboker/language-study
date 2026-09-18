@@ -35,6 +35,6 @@ class SocialAuthController extends Controller
         abort_if($user->is_blocked, 403);
         $ticket = Str::random(64);
         Cache::put('social-login:' . hash('sha256', $ticket), $user->id, now()->addMinute());
-        return redirect(rtrim((string) config('app.frontend_url'), '/') . '/auth/social/callback?ticket=' . urlencode($ticket));
+        return redirect(Str::rtrim((string) config('app.frontend_url'), '/') . '/auth/social/callback?ticket=' . urlencode($ticket));
     }
 }

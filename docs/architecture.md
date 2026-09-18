@@ -61,4 +61,5 @@ Storefront resources intentionally exclude provider names, models, API keys, and
 
 - [Translation Lifecycle](translation-lifecycle.md) — asynchronous request behavior
 - [AI Providers](ai-providers.md) — provider abstraction details
+- [Filament Resources](filament-resources.md) — page-local form and table configuration
 - [Deployment](deployment.md) — runtime topology and scaling

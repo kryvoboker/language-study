@@ -28,13 +28,17 @@ final class CancelTranslationAction
             return;
         }
 
-        $setting = AiProviderSetting::query()->where('key', $request->provider_key)->first();
+        $setting = AiProviderSetting::query()
+			->where('key', $request->provider_key)
+			->first();
         if ($setting === null) {
             return;
         }
 
         try {
-            $this->manager->driver($setting->key)->cancel($setting, $request->provider_operation_id);
+            $this->manager
+				->driver($setting->key)
+				->cancel($setting, $request->provider_operation_id);
         } catch (Throwable $exception) {
             report($exception);
         }

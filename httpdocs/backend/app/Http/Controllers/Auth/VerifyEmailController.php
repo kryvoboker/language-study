@@ -20,9 +20,9 @@ class VerifyEmailController extends Controller
 
         if (! $user->hasVerifiedEmail()) {
             $user->markEmailAsVerified();
-            Log::info('Email address verified', ['user_id' => $user->getKey()]);
+            Log::channel('stack')->info('Email address verified', ['user_id' => $user->getKey()]);
         }
 
-        return redirect(rtrim((string) config('app.frontend_url'), '/') . '/login?verified=1');
+        return redirect(Str::rtrim((string) config('app.frontend_url'), '/') . '/login?verified=1');
     }
 }
