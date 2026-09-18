@@ -6,7 +6,6 @@ namespace App\Models;
 
 use App\Enums\TranslationStatus;
 use App\Models\Users\User;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -33,7 +32,7 @@ class TranslationRequest extends Model
 	{
 		return [
 			'status'       => TranslationStatus::class,
-			'result'       => 'array',
+			'result'       => 'json:unicode',
 			'cancelled_at' => 'datetime',
 			'completed_at' => 'datetime',
 		];
@@ -45,12 +44,5 @@ class TranslationRequest extends Model
 	public function user(): BelongsTo
 	{
 		return $this->belongsTo(User::class);
-	}
-
-	public function result(): Attribute
-	{
-		return Attribute::make(
-			set: fn ($value) => is_iterable($value) ? to_json($value) : $value,
-		);
 	}
 }
