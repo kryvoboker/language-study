@@ -23,7 +23,7 @@ class AiProviderSetting extends Model
 	{
 		parent::__construct($attributes);
 
-		$this->default_max_input_characters = (int)config('app.max_characters_for_input_translate', 500);
+		$this->default_max_input_characters = (int)config('app.max_characters_for_input_translate', 12000);
 	}
 
 	protected static function booted(): void

@@ -13,7 +13,7 @@ class MeController extends Controller
 {
     public function __invoke(Request $request): array
     {
-		$max_input_characters = (int)config('app.max_characters_for_input_translate', 500);
+		$max_input_characters = (int)config('app.max_characters_for_input_translate', 12000);
 
         try {
             $max_input_characters = app(AiProviderResolver::class)

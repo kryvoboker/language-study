@@ -18,7 +18,7 @@ class StoreTranslationRequest extends FormRequest
 
     public function rules(): array
     {
-		$max_input_characters = (int)config('app.max_characters_for_input_translate', 500);
+		$max_input_characters = (int)config('app.max_characters_for_input_translate', 12000);
 
         if ($this->user() instanceof User) {
             try {

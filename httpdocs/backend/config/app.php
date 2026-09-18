@@ -130,6 +130,7 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
-	'max_characters_for_input_translate' => env('MAX_CHARACTERS_FOR_INPUT_TRANSLATE', 500)
+	'max_characters_for_input_translate' => env('MAX_CHARACTERS_FOR_INPUT_TRANSLATE', 12000),
+	'default_characters_for_input_translate' => env('DEFAULT_CHARACTERS_FOR_INPUT_TRANSLATE', 500),
 
 ];
