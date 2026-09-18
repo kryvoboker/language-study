@@ -52,7 +52,7 @@ After signing in, enter text in the translation workbench. NativeLens submits th
 | [API Reference](docs/api.md) | HTTP endpoints and OpenAPI contract |
 | [Deployment](docs/deployment.md) | Production topology and security |
 
-The machine-readable API contract is available at [`docs/openapi.yaml`](docs/openapi.yaml) and at the Laravel Swagger page `/docs/api`.
+The machine-readable API contract is available at [`httpdocs/backend/openapi/openapi.yaml`](httpdocs/backend/openapi/openapi.yaml) and OpenAPI docs for [`other pages`]([`httpdocs/backend/openapi/openapi.yaml`](httpdocs/backend/openapi/pages/)).
 
 ## Stack
 

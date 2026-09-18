@@ -1,7 +1,31 @@
 #!/usr/bin/env php
 <?php
 
+use Illuminate\Foundation\Application;
+use Symfony\Component\Console\Input\ArgvInput;
+
 define('LARAVEL_START', microtime(true));
+
+/**
+ * Force testing environment for `php artisan test` command.
+ */
+$argv_command = $argv[1] ?? null;
+
+if ($argv_command === 'test') {
+	$_ENV['APP_ENV']        = 'testing';
+	$_SERVER['APP_ENV']     = 'testing';
+	$_ENV['APP_CONFIG_CACHE']    = '/tmp/laravel-study-config-testing.php';
+
+	putenv('APP_ENV=testing');
+}
+
+// Register the Composer autoloader...
 require __DIR__.'/vendor/autoload.php';
-$status = (require_once __DIR__.'/bootstrap/app.php')->handleCommand(new Symfony\Component\Console\Input\ArgvInput);
+
+// Bootstrap Laravel and handle the command...
+/** @var Application $app */
+$app = require_once __DIR__.'/bootstrap/app.php';
+
+$status = $app->handleCommand(new ArgvInput);
+
 exit($status);
