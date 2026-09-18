@@ -16,13 +16,13 @@ use OpenAI;
 
 final class OpenAiProvider implements AiProviderContract
 {
-	/**
-	 * @param AiProviderSetting     $setting
-	 * @param TranslationPromptData $data
-	 *
-	 * @return ProviderOperationData
-	 * @throws JsonException
-	 */
+    /**
+     * @param AiProviderSetting     $setting
+     * @param TranslationPromptData $data
+     *
+     * @throws JsonException
+     * @return ProviderOperationData
+     */
     public function start(AiProviderSetting $setting, TranslationPromptData $data): ProviderOperationData
     {
         $configuration = $this->configuration($setting);
@@ -30,8 +30,7 @@ final class OpenAiProvider implements AiProviderContract
 
         $response = $client->responses()->create([
             'model' => $configuration['model'],
-            'background' => true,
-            'store' => true,
+            ...$configuration['request'],
             'instructions' => $this->instructions($setting),
             'input' => [[
                 'role' => 'user',
@@ -57,13 +56,13 @@ final class OpenAiProvider implements AiProviderContract
         return new ProviderOperationData($response->id, (string) $response->status);
     }
 
-	/**
-	 * @param AiProviderSetting $setting
-	 * @param string            $operation_id
-	 *
-	 * @return ProviderResultData
-	 * @throws JsonException
-	 */
+    /**
+     * @param AiProviderSetting $setting
+     * @param string            $operation_id
+     *
+     * @throws JsonException
+     * @return ProviderResultData
+     */
     public function retrieve(AiProviderSetting $setting, string $operation_id): ProviderResultData
     {
         $client = OpenAI::client($this->configuration($setting)['api_key']);
@@ -84,7 +83,9 @@ final class OpenAiProvider implements AiProviderContract
         $client->responses()->cancel($operation_id);
     }
 
-    /** @return array{api_key: string, model: string} */
+    /**
+     * @return array{api_key: string, model: string, request: array<string, mixed>}
+     */
     private function configuration(AiProviderSetting $setting): array
     {
         $configuration = $setting->configuration ?? [];
@@ -96,9 +97,57 @@ final class OpenAiProvider implements AiProviderContract
 
         $model = $configuration['model'] ?? 'gpt-5.6-luna';
 
+        $request = [
+            'background' => true,
+            'store' => true,
+        ];
+
+        foreach (['background', 'store'] as $key) {
+            if (array_key_exists($key, $configuration) && is_bool($configuration[$key])) {
+                $request[$key] = $configuration[$key];
+            }
+        }
+
+        foreach (['max_output_tokens'] as $key) {
+            if (array_key_exists($key, $configuration) && is_numeric($configuration[$key])) {
+                $value = (int) $configuration[$key];
+
+                if ($value > 0) {
+                    $request[$key] = $value;
+                }
+            }
+        }
+
+        foreach (['temperature'] as $key) {
+            if (array_key_exists($key, $configuration) && is_numeric($configuration[$key])) {
+                $request[$key] = (float) $configuration[$key];
+            }
+        }
+
+        foreach (['service_tier'] as $key) {
+            if (is_string($configuration[$key] ?? null) && Str::trim($configuration[$key]) !== '') {
+                $request[$key] = $configuration[$key];
+            }
+        }
+
+        $reasoning = [];
+
+        foreach (['effort', 'summary', 'mode'] as $key) {
+            $configurationKey = "reasoning_$key";
+
+            if (is_string($configuration[$configurationKey] ?? null) && Str::trim($configuration[$configurationKey]) !== '') {
+                $reasoning[$key] = $configuration[$configurationKey];
+            }
+        }
+
+        if ($reasoning !== []) {
+            $request['reasoning'] = $reasoning;
+        }
+
         return [
             'api_key' => $apiKey,
             'model' => is_string($model) && Str::trim($model) !== '' ? $model : 'gpt-5.6-luna',
+            'request' => $request,
         ];
     }
 
