@@ -6,8 +6,6 @@ namespace httpdocs\backend\phpcs\ProjectStandard\Sniffs\Naming;
 
 use PHP_CodeSniffer\Sniffs\Sniff;
 
-use const ProjectStandard\Sniffs\Naming\T_EQUAL;
-
 // PHPCS uses global token constants and its own runtime classes.
 // Keep IDE-only compatibility stubs in a separate file, but do not load them here.
 
@@ -91,7 +89,7 @@ final class NamingConventionSniff implements Sniff
     private function checkVariable(File $file, int $ptr): void
     {
         $tokens = $file->getTokens();
-        $name = Str::ltrim($tokens[$ptr]['content'], '$');
+        $name = ltrim($tokens[$ptr]['content'], '$');
 
         if (in_array($name, self::ALLOWED_VARIABLES, true)) {
             return;
