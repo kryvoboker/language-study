@@ -1,4 +1,4 @@
-[← Getting Started](getting-started.md) · [Back to README](../README.md) · [Authentication →](authentication.md)
+[← Getting Started](getting-started.md) · [Back to README](../README.md) · [Helpers and Bootstrap →](helpers-and-bootstrap.md)
 
 # Architecture
 

@@ -1,4 +1,4 @@
-[← Architecture](architecture.md) · [Back to README](../README.md) · [AI Providers →](ai-providers.md)
+[← Helpers and Bootstrap](helpers-and-bootstrap.md) · [Back to README](../README.md) · [AI Providers →](ai-providers.md)
 
 # Authentication
 

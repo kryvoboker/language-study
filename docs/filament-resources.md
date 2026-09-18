@@ -1,4 +1,4 @@
-[← Architecture](architecture.md) · [Back to README](../README.md) · [Admin Authorization →](admin-authorization.md)
+[← Deployment](deployment.md) · [Back to README](../README.md)
 
 # Filament resources
 

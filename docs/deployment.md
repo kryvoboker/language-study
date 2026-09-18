@@ -1,4 +1,4 @@
-[← API Reference](api.md) · [Back to README](../README.md)
+[← API Reference](api.md) · [Back to README](../README.md) · [Filament Resources →](filament-resources.md)
 
 # Deployment
 

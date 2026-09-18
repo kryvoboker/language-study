@@ -44,6 +44,7 @@ After signing in, enter text in the translation workbench. NativeLens submits th
 |-------|-------------|
 | [Getting Started](docs/getting-started.md) | Local setup and first run |
 | [Architecture](docs/architecture.md) | Applications, layers, and data flow |
+| [Helpers and Bootstrap](docs/helpers-and-bootstrap.md) | Shared PHP helpers and Laravel bootstrap |
 | [Authentication](docs/authentication.md) | Storefront and admin authentication |
 | [AI Providers](docs/ai-providers.md) | Provider contract and OpenAI adapter |
 | [Translation Lifecycle](docs/translation-lifecycle.md) | Debounce, queues, polling, and cancellation |
@@ -51,6 +52,7 @@ After signing in, enter text in the translation workbench. NativeLens submits th
 | [Configuration](docs/configuration.md) | Environment variables and runtime settings |
 | [API Reference](docs/api.md) | HTTP endpoints and OpenAPI contract |
 | [Deployment](docs/deployment.md) | Production topology and security |
+| [Filament Resources](docs/filament-resources.md) | Resource schemas, tables, and pages |
 
 The machine-readable API contract is available at [`httpdocs/backend/openapi/openapi.yaml`](httpdocs/backend/openapi/openapi.yaml) and OpenAPI docs for [`other pages`]([`httpdocs/backend/openapi/openapi.yaml`](httpdocs/backend/openapi/pages/)).
 
