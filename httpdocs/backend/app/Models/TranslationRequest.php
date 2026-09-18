@@ -50,7 +50,7 @@ class TranslationRequest extends Model
 	public function result(): Attribute
 	{
 		return Attribute::make(
-			set: fn ($value) => to_json($value),
+			set: fn ($value) => is_iterable($value) ? to_json($value) : $value,
 		);
 	}
 }

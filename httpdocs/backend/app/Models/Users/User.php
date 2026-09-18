@@ -45,12 +45,14 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail, OAu
 			'email_verified_at' => 'datetime',
 			'password'          => 'hashed',
 			'is_blocked'        => 'boolean',
+			'is_active'         => 'boolean',
 		];
 	}
 
 	public function canAccessPanel(Panel $panel): bool
 	{
-		return !$this->is_blocked
+		return $this->is_active
+			&& !$this->is_blocked
 			&& $this->hasVerifiedEmail()
 			&& !$this->hasRole('user')
 			&& $this->can('access_admin_panel');
