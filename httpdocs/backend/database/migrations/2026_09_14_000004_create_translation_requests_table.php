@@ -12,13 +12,13 @@ return new class () extends Migration {
             $table->uuid('id')->primary();
 
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-			$table->char('request_hash', 64)
-				->nullable(false)
-				->index();
+            $table->char('request_hash', 64)
+                ->nullable(false)
+                ->index();
             $table->longText('source_text');
             $table->string('source_language', 12);
             $table->string('target_language', 12);
-			$table->string('locale', 12)->default('en');
+            $table->string('locale', 12)->default('en');
             $table->string('status', 24)->index();
             $table->string('provider_key')->nullable()->index();
             $table->string('provider_operation_id')->nullable()->index();

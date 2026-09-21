@@ -18,71 +18,71 @@ use Illuminate\Support\Str;
  */
 class TranslationRequest extends Model
 {
-	use HasUuids;
+    use HasUuids;
 
-	protected $fillable = [
-		'user_id',
-		'source_text',
-		'source_language',
-		'target_language',
-		'request_hash',
-		'locale',
-		'status',
-		'provider_key',
-		'provider_operation_id',
-		'result',
-		'error_message',
-		'cancelled_at',
-		'completed_at',
-	];
+    protected $fillable = [
+        'user_id',
+        'source_text',
+        'source_language',
+        'target_language',
+        'request_hash',
+        'locale',
+        'status',
+        'provider_key',
+        'provider_operation_id',
+        'result',
+        'error_message',
+        'cancelled_at',
+        'completed_at',
+    ];
 
-	protected function casts(): array
-	{
-		return [
-			'status'       => TranslationStatus::class,
-			'result'       => 'json:unicode',
-			'cancelled_at' => 'datetime',
-			'completed_at' => 'datetime',
-		];
-	}
+    protected function casts(): array
+    {
+        return [
+            'status' => TranslationStatus::class,
+            'result' => 'json:unicode',
+            'cancelled_at' => 'datetime',
+            'completed_at' => 'datetime',
+        ];
+    }
 
-	/** @return Attribute<array<string, mixed>|null, array<string, mixed>|string|null> */
-	public function result(): Attribute
-	{
-		return Attribute::make(
-			set: static fn(mixed $value): mixed => is_array($value)
-				? to_json($value)
-				: $value,
-		);
-	}
+    /** @return Attribute<array<string, mixed>|null, array<string, mixed>|string|null> */
+    public function result(): Attribute
+    {
+        return Attribute::make(
+            set: static fn (mixed $value): mixed => is_array($value)
+                ? to_json($value)
+                : $value,
+        );
+    }
 
-	/**
-	 * @param string $source_text
-	 * @param string $source_language
-	 * @param string $target_language
-	 * @param string $current_locale
-	 *
-	 * @return string
-	 */
-	public static function generateRequestHash(
-		string $source_text,
-		string $source_language,
-		string $target_language,
-		string $current_locale
-	): string {
-		$normalized_values = array_map(
-			static fn(string $value): string => Str::lower(sanitize_str($value)),
-			[$source_text, $source_language, $target_language, $current_locale],
-		);
+    /**
+     * @param string $source_text
+     * @param string $source_language
+     * @param string $target_language
+     * @param string $current_locale
+     *
+     * @return string
+     */
+    public static function generateRequestHash(
+        string $source_text,
+        string $source_language,
+        string $target_language,
+        string $current_locale,
+    ): string {
+        $normalized_values = array_map(
+            static fn (string $value): string => Str::lower(sanitize_str($value)),
+            [$source_text, $source_language, $target_language, $current_locale],
+        );
 
-		return hash('sha256', implode("\0", $normalized_values));
-	}
+        return hash('sha256', implode("\0", $normalized_values));
+    }
 
-	/**
-	 * @return BelongsTo<User, $this>
-	 */
-	public function user(): BelongsTo
-	{
-		return $this->belongsTo(User::class);
-	}
+    /**
+     * @return BelongsTo<User, $this>
+     */
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
 }

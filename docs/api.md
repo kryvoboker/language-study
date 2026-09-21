@@ -6,7 +6,7 @@ The API is versioned under `/api/v1`. The complete OpenAPI 3.1 contract is [`ope
 
 ## Authentication
 
-Protected routes require a Passport bearer token and verified email. Public authentication routes are rate-limited separately.
+Protected routes require authentication and verified email. Most use a Passport bearer token; translation routes also accept an authenticated Laravel web session. Public authentication routes are rate-limited separately.
 
 ```http
 Authorization: Bearer <passport-access-token>
@@ -27,7 +27,7 @@ For the Nuxt storefront, callers use same-origin BFF routes; the BFF adds this h
 
 ## User and translation endpoints
 
-Translation endpoints accept either a Passport bearer token or an authenticated Laravel web session (including the Filament admin session). Session-authenticated state-changing requests must include a valid CSRF token.
+Translation endpoints accept either a Passport bearer token or an authenticated Laravel web session (including the Filament admin session). The user must have a verified email, be active, and not be blocked. Session-authenticated state-changing requests must include a valid CSRF token.
 
 | Method | Endpoint | Purpose |
 |--------|----------|---------|
@@ -35,6 +35,12 @@ Translation endpoints accept either a Passport bearer token or an authenticated 
 | `POST` | `/translation-requests` | Create a translation request |
 | `GET` | `/translation-requests/{translation_request}` | Read status or result |
 | `DELETE` | `/translation-requests/{translation_request}` | Cancel a request |
+
+Translation access errors use stable `code` values. Anonymous and inactive users receive `401` with `login_required`; the storefront asks them to sign in. Blocked users receive `403` with `account_blocked`; the storefront explains the restriction and directs them to technical support. These checks apply to creating, polling, and cancelling translation requests.
+
+## Register a user
+
+`POST /api/v1/auth/register` accepts `multipart/form-data`. `name`, `email`, `password`, and `password_confirmation` are required; passwords must contain 6–32 characters, may include special characters, and require a matching confirmation. Password resets use the same length limits. `avatar` is optional and accepts JPG or PNG images up to 2 MB. Uploaded avatars are stored under the date-resolved `app.user_dir` path in `images/avatar/`.
 
 ## Create a translation request
 
@@ -76,7 +82,7 @@ The endpoint returns `202 Accepted` with a request resource. Poll it until `comp
 - Translation creation: 60 requests per minute.
 - Translation text: 1–12,000 characters.
 
-Laravel validation, authentication, authorization, and rate-limit failures use the backend's status and error body. Treat non-2xx responses as failures and never expose provider credentials or metadata to clients.
+Laravel validation, authentication, authorization, and rate-limit failures use the backend's status and error body. Authentication/authorization errors include stable `code` values where the storefront needs distinct handling. Treat non-2xx responses as failures and never expose provider credentials or metadata to clients.
 
 ## See Also
 

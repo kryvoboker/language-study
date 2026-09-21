@@ -21,7 +21,9 @@
     "empty": "Your translation will appear here.",
     "analyzing": "Analyzing language…",
     "ready": "Ready",
-    "limitError": "Text exceeds the {limit} character limit."
+    "limitError": "Text exceeds the {limit} character limit.",
+    "loginRequired": "Please sign in to your account before translating text.",
+    "accountBlocked": "Your account is blocked and can no longer use this service. Contact technical support to resolve this issue."
   },
   "coach": {
     "natural": "How native speakers say it",
@@ -42,7 +44,16 @@
     "loginHint": "Continue through the secure Laravel OAuth flow.",
     "continueWith": "Continue with",
     "pkceHint": "The storefront is designed for Passport Authorization Code + PKCE.",
-    "create": "Create account"
+    "create": "Create account",
+    "name": "Name",
+    "email": "Email",
+    "password": "Password",
+    "passwordHelp": "Use 6–32 characters. Special characters are allowed.",
+    "passwordConfirmation": "Confirm password",
+    "avatarOptional": "Profile image (optional)",
+    "avatarHelp": "JPG or PNG; up to 2 MB.",
+    "registrationSuccess": "Account created. Check your email for the verification link.",
+    "registrationFailed": "Registration failed. Check the entered data and try again."
   },
   "account": {
     "title": "My account",

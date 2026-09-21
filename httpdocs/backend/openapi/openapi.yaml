@@ -30,6 +30,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TranslationRequest'
+        '401':
+          description: Sign-in required (anonymous or inactive account)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessError'
+        '403':
+          description: Account is blocked
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessError'
   /translation-requests/{translationRequest}:
     parameters:
       - name: translationRequest
@@ -47,11 +59,35 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TranslationRequest'
+        '401':
+          description: Sign-in required (anonymous or inactive account)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessError'
+        '403':
+          description: Account is blocked
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessError'
     delete:
       summary: Cancel translation request
       responses:
         '204':
           description: Cancelled or already terminal
+        '401':
+          description: Sign-in required (anonymous or inactive account)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessError'
+        '403':
+          description: Account is blocked
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessError'
   /auth/login:
     post:
       security: []
@@ -68,8 +104,22 @@ paths:
     post:
       security: []
       summary: Register local user
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [name, email, password, password_confirmation]
+              properties:
+                name: { type: string, maxLength: 120 }
+                email: { type: string, format: email }
+                password: { type: string, minLength: 6, maxLength: 32, format: password, description: Special characters are allowed }
+                password_confirmation: { type: string, minLength: 6, maxLength: 32, format: password }
+                avatar: { type: string, format: binary, description: Optional JPG or PNG image up to 2 MB }
       responses:
         '201': { description: Created }
+        '422': { description: Invalid registration fields or avatar }
   /auth/forgot-password:
     post:
       security: []
@@ -90,8 +140,8 @@ paths:
               properties:
                 token: { type: string }
                 email: { type: string, format: email }
-                password: { type: string, minLength: 10, format: password }
-                password_confirmation: { type: string, format: password }
+                password: { type: string, minLength: 6, maxLength: 32, format: password }
+                password_confirmation: { type: string, minLength: 6, maxLength: 32, format: password }
       responses:
         '200':
           description: Password reset
@@ -114,6 +164,14 @@ components:
             profile: Read own profile
             translate: Create and manage own translations
   schemas:
+    AccessError:
+      type: object
+      required: [code, message]
+      properties:
+        code:
+          type: string
+          enum: [login_required, account_blocked]
+        message: { type: string }
     CreateTranslationRequest:
       type: object
       required: [source_text, source_language, target_language]

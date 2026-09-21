@@ -21,13 +21,37 @@ export default defineEventHandler(async (event): Promise<unknown> => {
     const upstreamUrl = `${config.apiInternalBase}/${path}`
     return await $fetch<unknown>(upstreamUrl, options)
   } catch (error) {
-    const statusCode = (error as { statusCode?: number; response?: { status?: number } }).statusCode
+    const upstreamResponseError = error as {
+      statusCode?: number
+      response?: { status?: number }
+      data?: { code?: unknown; errors?: unknown }
+    }
+    const statusCode = upstreamResponseError.statusCode
       ?? (error as { response?: { status?: number } }).response?.status
 
     if (statusCode !== undefined && statusCode >= 400 && statusCode < 500) {
+      const code = ['login_required', 'account_blocked'].includes(String(upstreamResponseError.data?.code))
+        ? String(upstreamResponseError.data?.code)
+        : undefined
+      const data: Record<string, unknown> = {}
+
+      if (code) {
+        data.code = code
+      }
+
+      if (
+        statusCode === 422 &&
+        upstreamResponseError.data?.errors !== null &&
+        typeof upstreamResponseError.data?.errors === 'object' &&
+        Array.isArray((upstreamResponseError.data.errors as Record<string, unknown>).source_text)
+      ) {
+        data.errors = { source_text: ['invalid'] }
+      }
+
       throw createError({
         statusCode,
         statusMessage: statusCode === 401 ? 'Unauthenticated.' : 'Upstream request rejected.',
+        data,
       })
     }
 

@@ -11,27 +11,27 @@ use App\Models\AiProviderSetting;
 
 interface AiProviderContract
 {
-	/**
-	 * @param AiProviderSetting     $setting
-	 * @param TranslationPromptData $data
-	 *
-	 * @return ProviderOperationData
-	 */
+    /**
+     * @param AiProviderSetting     $setting
+     * @param TranslationPromptData $data
+     *
+     * @return ProviderOperationData
+     */
     public function start(AiProviderSetting $setting, TranslationPromptData $data): ProviderOperationData;
 
-	/**
-	 * @param AiProviderSetting $setting
-	 * @param string            $operation_id
-	 *
-	 * @return ProviderResultData
-	 */
+    /**
+     * @param AiProviderSetting $setting
+     * @param string            $operation_id
+     *
+     * @return ProviderResultData
+     */
     public function retrieve(AiProviderSetting $setting, string $operation_id): ProviderResultData;
 
-	/**
-	 * @param AiProviderSetting $setting
-	 * @param string            $operation_id
-	 *
-	 * @return void
-	 */
+    /**
+     * @param AiProviderSetting $setting
+     * @param string            $operation_id
+     *
+     * @return void
+     */
     public function cancel(AiProviderSetting $setting, string $operation_id): void;
 }

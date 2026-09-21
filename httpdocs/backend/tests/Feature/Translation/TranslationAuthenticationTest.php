@@ -21,7 +21,7 @@ class TranslationAuthenticationTest extends TestCase
     public function test_verified_passport_user_can_create_a_translation_request(): void
     {
         Queue::fake();
-        $user = User::factory()->create();
+        $user = User::factory()->create(['is_active' => true]);
         $this->enableProvider();
         Passport::actingAs($user, ['translate']);
 
@@ -35,7 +35,7 @@ class TranslationAuthenticationTest extends TestCase
     public function test_verified_filament_session_user_can_create_a_translation_request_with_csrf(): void
     {
         Queue::fake();
-        $user = User::factory()->create();
+        $user = User::factory()->create(['is_active' => true]);
         $this->enableProvider();
 
         $this->actingAs($user, 'web')
@@ -49,13 +49,47 @@ class TranslationAuthenticationTest extends TestCase
 
     public function test_anonymous_user_cannot_create_a_translation_request(): void
     {
+        Queue::fake();
+
         $this->postJson('/api/v1/translation-requests', $this->payload())
-            ->assertUnauthorized();
+            ->assertUnauthorized()
+            ->assertJsonPath('code', 'login_required');
+
+        Queue::assertNothingPushed();
+        $this->assertDatabaseCount('translation_requests', 0);
+    }
+
+    public function test_inactive_user_cannot_create_a_translation_request(): void
+    {
+        Queue::fake();
+        $user = User::factory()->create(['is_active' => false]);
+        Passport::actingAs($user, ['translate']);
+
+        $this->postJson('/api/v1/translation-requests', $this->payload())
+            ->assertUnauthorized()
+            ->assertJsonPath('code', 'login_required');
+
+        Queue::assertNothingPushed();
+        $this->assertDatabaseCount('translation_requests', 0);
+    }
+
+    public function test_blocked_user_gets_a_distinct_denial_even_if_also_inactive(): void
+    {
+        Queue::fake();
+        $user = User::factory()->create(['is_active' => false, 'is_blocked' => true]);
+        Passport::actingAs($user, ['translate']);
+
+        $this->postJson('/api/v1/translation-requests', $this->payload())
+            ->assertForbidden()
+            ->assertJsonPath('code', 'account_blocked');
+
+        Queue::assertNothingPushed();
+        $this->assertDatabaseCount('translation_requests', 0);
     }
 
     public function test_source_text_cannot_exceed_the_configured_provider_limit(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->create(['is_active' => true]);
         $this->enableProvider(['max_input_characters' => 5]);
         Passport::actingAs($user, ['translate']);
 
@@ -69,7 +103,7 @@ class TranslationAuthenticationTest extends TestCase
 
     public function test_authenticated_user_receives_the_configured_provider_limit(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->create(['is_active' => true]);
         $this->enableProvider(['max_input_characters' => 5]);
         Passport::actingAs($user, ['profile']);
 
@@ -80,7 +114,7 @@ class TranslationAuthenticationTest extends TestCase
 
     public function test_translation_locale_must_be_supported(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->create(['is_active' => true]);
         $this->enableProvider();
         Passport::actingAs($user, ['translate']);
 
@@ -95,7 +129,7 @@ class TranslationAuthenticationTest extends TestCase
     public function test_completed_translation_is_reused_for_normalized_request_data(): void
     {
         Queue::fake();
-        $user = User::factory()->create();
+        $user = User::factory()->create(['is_active' => true]);
         $this->enableProvider();
         TranslationRequest::query()->create([
             'user_id' => User::factory()->create()->id,
@@ -130,7 +164,7 @@ class TranslationAuthenticationTest extends TestCase
     public function test_completed_translation_exposes_a_natural_variant_without_repeating_the_translation(): void
     {
         Queue::fake();
-        $user = User::factory()->create();
+        $user = User::factory()->create(['is_active' => true]);
         $this->enableProvider();
         TranslationRequest::query()->create([
             'user_id' => User::factory()->create()->id,
@@ -168,7 +202,7 @@ class TranslationAuthenticationTest extends TestCase
     public function test_completed_sentence_can_have_no_natural_variant(): void
     {
         Queue::fake();
-        $user = User::factory()->create();
+        $user = User::factory()->create(['is_active' => true]);
         $this->enableProvider();
         TranslationRequest::query()->create([
             'user_id' => User::factory()->create()->id,
