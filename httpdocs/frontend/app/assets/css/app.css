@@ -1,35 +1,141 @@
-@import "tailwindcss";
+@layer theme, base, app, components, utilities;
+
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/preflight.css" layer(base);
+@import "tailwindcss/utilities.css" layer(utilities);
+
 @import "flyonui/variants.css";
 
 @plugin "flyonui" {
-  themes: light --default, black --prefersdark;
+    root: "html";
+    themes: light --default, dark --prefersdark;
+    logs: true;
 }
 
+/*@plugin "flyonui/theme" {*/
+/*    name: "light";*/
+/*    default: true; !* Set as default theme *!*/
+/*    prefersdark: false; !* Set dark mode for prefers-color-scheme: dark *!*/
+/*    color-scheme: light; !* Defines the color of browser UI *!*/
+
+/*    --btn-color: var(--color-base-content);*/
+/*}*/
+
+@plugin "flyonui/theme" {
+    name: "dark";
+    default: false; /* Set as default theme */
+    prefersdark: false; /* Set dark mode for prefers-color-scheme: dark */
+    color-scheme: dark; /* Defines the color of browser UI */
+
+    --btn-color: #fff;
+}
+
+/*@plugin "../../../node_modules/flyonui/index.js";*/
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 @plugin "@iconify/tailwind4";
+@source "../../../node_modules/flyonui/dist/index.js";
+@source "../../**/*.{vue,ts}";
+@source "/../../../../backend/resources/views/storefront/**/*.blade.php";
 
-@source "../../../node_modules/flyonui/flyonui.js";
+@layer utilities {
+    .container {
+        @apply 2xl:max-w-480 px-4 py-6 sm:px-6 mx-auto my-0;
+    }
 
-/*html { background-color: var(--color-base-100); }*/
-body { min-width: 320px; }
+    .container .container {
+        @apply max-w-none px-0;
+    }
 
-.theme-switch__to-light { display: none; }
-.theme-switch__to-dark { display: inline-block; }
+    .theme-switch__to-light {
+        @apply hidden;
+    }
 
-@media (prefers-color-scheme: dark) {
-  html:not([data-theme]) .theme-switch__to-light { display: inline-block; }
-  html:not([data-theme]) .theme-switch__to-dark { display: none; }
+    .theme-switch__to-dark {
+        @apply inline-block;
+    }
+
+    @media (prefers-color-scheme: dark) {
+        html:not([data-theme]) .theme-switch__to-light {
+            @apply inline-block;
+        }
+
+        html:not([data-theme]) .theme-switch__to-dark {
+            @apply hidden;
+        }
+    }
+
+    html[data-theme="dark"] .theme-switch__to-light {
+        @apply inline-block
+    }
+
+    html[data-theme="dark"] .theme-switch__to-dark {
+        @apply hidden;
+    }
+
+    html[data-theme="light"] .theme-switch__to-light {
+        @apply hidden;
+    }
+
+    html[data-theme="light"] .theme-switch__to-dark {
+        @apply inline-block;
+    }
+
+    html[data-is-system-theme="1"] .theme-switch__to-light,
+    html[data-is-system-theme="1"] .theme-switch__to-dark {
+        @apply hidden;
+    }
+
+    html[data-is-system-theme="0"] .theme-switch__to-system {
+        @apply hidden;
+    }
+
+    .card {
+        @apply rounded-3xl border border-base-content/30 bg-base-200 shadow-2xl;
+    }
+
+    .card-body {
+        @apply gap-5;
+    }
 }
 
-html[data-theme="black"] .theme-switch__to-light { display: inline-block; }
-html[data-theme="black"] .theme-switch__to-dark { display: none; }
-html[data-theme="light"] .theme-switch__to-light { display: none; }
-html[data-theme="light"] .theme-switch__to-dark { display: inline-block; }
+@layer app {
+    /* Disable animation if user disable it in his device */
+    *, ::after, ::before, ::backdrop, ::file-selector-button {
+        @apply motion-reduce:animate-none! motion-reduce:transition-none! motion-reduce:scroll-auto!;
+    }
 
-.workspace-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+    html,
+    body,
+    #__nuxt {
+        @apply h-full;
+    }
+
+    #__nuxt > .wrapper {
+        @apply flex flex-col min-h-full;
+    }
+
+    .main {
+        @apply shrink grow basis-auto relative;
+    }
+
+    .workspace-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+    }
+
+    @media (max-width: 1024px) {
+        .workspace-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .text-panel {
+        min-height: 420px;
+    }
+
+    .issue-mark {
+        text-decoration-line: underline;
+        text-decoration-style: wavy;
+        text-decoration-thickness: 1.5px;
+    }
 }
-@media (max-width: 1024px) { .workspace-grid { grid-template-columns: 1fr; } }
-
-.text-panel { min-height: 420px; }
-.issue-mark { text-decoration-line: underline; text-decoration-style: wavy; text-decoration-thickness: 1.5px; }

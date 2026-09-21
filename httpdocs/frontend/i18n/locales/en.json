@@ -1,5 +1,6 @@
 {
   "nav": {
+    "home": "Home",
     "login": "Log in",
     "signup": "Create account",
     "account": "My account",
@@ -36,7 +37,6 @@
     "clean": "No meaningful language issues found."
   },
   "benefits": {
-    "private": "Provider details stay private",
     "fast": "Debounced and cancellable",
     "learn": "Corrections with explanations"
   },
