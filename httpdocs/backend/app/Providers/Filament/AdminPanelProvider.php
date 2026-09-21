@@ -48,7 +48,7 @@ class AdminPanelProvider extends PanelProvider
             // Show group menu list if user visited page from group
             ->sidebarCollapsibleOnDesktop()
             ->passwordReset()
-            ->emailVerification()
+            // TODO: Restore Filament email verification if email verification is re-enabled.
             ->navigationGroups([
                 AdminNavigationGroupEnum::Users->getLabel(),
                 AdminNavigationGroupEnum::AiProviders->getLabel(),

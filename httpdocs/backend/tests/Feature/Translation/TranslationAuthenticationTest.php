@@ -18,7 +18,7 @@ class TranslationAuthenticationTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_verified_passport_user_can_create_a_translation_request(): void
+    public function test_active_passport_user_can_create_a_translation_request_without_email_verification(): void
     {
         Queue::fake();
         $user = User::factory()->create(['is_active' => true]);
@@ -32,7 +32,7 @@ class TranslationAuthenticationTest extends TestCase
         $this->assertDatabaseHas('translation_requests', ['locale' => 'ru']);
     }
 
-    public function test_verified_filament_session_user_can_create_a_translation_request_with_csrf(): void
+    public function test_active_filament_session_user_can_create_a_translation_request_with_csrf(): void
     {
         Queue::fake();
         $user = User::factory()->create(['is_active' => true]);

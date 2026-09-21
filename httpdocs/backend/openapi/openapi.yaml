@@ -8,6 +8,22 @@ servers:
 security:
   - passport: []
 paths:
+  /contact-requests:
+    post:
+      security: [{ passport: [] }, {}]
+      summary: Submit a Contact request (guest or optional authenticated identity)
+      description: Authenticated requests may include a Passport bearer token or Laravel session. Guest identity fields are required. Telegram delivery is asynchronous after persistence.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CreateContactRequest'
+      responses:
+        '202': { description: Contact request persisted and queued for Telegram delivery }
+        '422': { description: Validation failed }
+        '429': { description: Rate limit exceeded }
+
   /me:
     get:
       summary: Current user
@@ -164,6 +180,21 @@ components:
             profile: Read own profile
             translate: Create and manage own translations
   schemas:
+    CreateContactRequest:
+      type: object
+      required: [message]
+      properties:
+        first_name: { type: string, maxLength: 120, description: Required for guests; ignored identity is not accepted for authenticated users. }
+        last_name: { type: string, maxLength: 120, description: Required for guests. }
+        email: { type: string, format: email, maxLength: 255, description: Required for guests. }
+        message: { type: string, minLength: 1, maxLength: 10000 }
+        images[]:
+          type: array
+          maxItems: 10
+          items:
+            type: string
+            format: binary
+            description: JPEG or PNG up to 5 MB each.
     AccessError:
       type: object
       required: [code, message]

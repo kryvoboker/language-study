@@ -12,7 +12,7 @@ use RuntimeException;
 
 class MeController extends Controller
 {
-    /** @return array{id: int|string, name: string, email: string, max_input_characters: int} */
+    /** @return array{id: int|string, name: string, email: string, is_blocked: bool, is_active: bool, max_input_characters: int} */
     public function __invoke(Request $request): array
     {
         $max_input_characters = integer_value(config('app.max_characters_for_input_translate', 12000));
@@ -31,6 +31,8 @@ class MeController extends Controller
             'id' => $user->id,
             'name' => (string) $user->name,
             'email' => (string) $user->email,
+            'is_blocked' => (bool) $user->is_blocked,
+            'is_active' => (bool) $user->is_active,
             'max_input_characters' => $max_input_characters,
         ];
     }

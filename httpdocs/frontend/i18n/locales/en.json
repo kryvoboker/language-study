@@ -3,6 +3,7 @@
     "login": "Log in",
     "signup": "Create account",
     "account": "My account",
+    "contact": "Contact",
     "logout": "Log out"
   },
   "hero": {
@@ -52,12 +53,39 @@
     "passwordConfirmation": "Confirm password",
     "avatarOptional": "Profile image (optional)",
     "avatarHelp": "JPG or PNG; up to 2 MB.",
-    "registrationSuccess": "Account created. Check your email for the verification link.",
+    "registrationSuccess": "Account created. You can now sign in.",
     "registrationFailed": "Registration failed. Check the entered data and try again."
   },
   "account": {
     "title": "My account",
     "email": "Email"
+  },
+  "contact": {
+    "title": "Contact support",
+    "intro": "Send us a message and, if useful, attach up to 10 screenshots or photos.",
+    "signedInAs": "Submitting as {name} ({email}).",
+    "blockedNotice": "Your account is blocked. This request will be clearly marked for support, and you can still contact us here.",
+    "firstName": "First name",
+    "lastName": "Last name",
+    "email": "Email",
+    "message": "Message",
+    "messagePlaceholder": "How can we help?",
+    "images": "Photos (optional)",
+    "selectedImages": "Selected images",
+    "imageHelp": "Choose up to 10 JPG or PNG images, no larger than 5 MB each.",
+    "submit": "Send message",
+    "sending": "Sending…",
+    "accepted": "Your request was received. We will get back to you.",
+    "failed": "We could not accept your request. Please try again.",
+    "invalid": "Please check the form fields and selected images.",
+    "invalidFirstName": "Enter a first name up to 120 characters.",
+    "invalidLastName": "Enter a last name up to 120 characters.",
+    "invalidEmail": "Enter a valid email address.",
+    "invalidMessage": "Enter a message of up to 10,000 characters.",
+    "fileCountError": "You can attach no more than 10 images.",
+    "fileSizeError": "Each image must be no larger than 5 MB.",
+    "fileTypeError": "Only JPG and PNG images are allowed.",
+    "removeImage": "Remove {name}"
   },
   "theme": {
     "toggle": "Toggle light/dark theme"

@@ -11,7 +11,7 @@ const login = async () => {
     await $fetch('/api/auth/login', { method: 'POST', body: { email: email.value, password: password.value } })
     await refresh()
     await navigateTo('/')
-  } catch { errorMessage.value = 'Unable to sign in. Check your credentials and email verification.' } finally { loading.value = false }
+  } catch { errorMessage.value = 'Unable to sign in. Check your credentials and try again.' } finally { loading.value = false }
 }
 </script>
 <template>

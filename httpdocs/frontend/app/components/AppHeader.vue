@@ -23,6 +23,7 @@ const signOut = async () => {
         <span>NativeLens</span>
       </NuxtLink>
       <nav class="flex items-center gap-2">
+        <NuxtLink to="/contact" class="btn btn-text btn-sm">{{ $t('nav.contact') }}</NuxtLink>
         <button
           type="button"
           class="btn btn-square btn-text btn-sm"

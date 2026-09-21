@@ -13,7 +13,7 @@ Configuration is split between `httpdocs/backend/.env` and `httpdocs/frontend/.e
 | `APP_KEY` | Laravel encryption key | Generate with `php artisan key:generate` |
 | `APP_DEBUG` | Local debugging | `true` locally |
 | `APP_URL` | Backend public URL | `http://localhost:8080` |
-| `FRONTEND_URL` | Storefront URL used by verification/social redirects | `http://localhost:8080` |
+| `FRONTEND_URL` | Storefront URL used by social-authentication redirects | `http://localhost:8080` |
 | `CORS_ALLOWED_ORIGINS` | Comma-separated browser origins | `http://localhost:8080,http://localhost:3000` |
 | `NEW_STORAGE_PATH` | External Laravel storage path | `/var/www/storage` |
 | `DB_CONNECTION` | Database driver | `mysql` |
@@ -28,6 +28,8 @@ Configuration is split between `httpdocs/backend/.env` and `httpdocs/frontend/.e
 | `GOOGLE_*` | Google Socialite credentials | Empty until configured |
 | `GITHUB_*` | GitHub Socialite credentials | Empty until configured |
 | `FACEBOOK_*` | Facebook Socialite credentials | Empty until configured |
+| `CONTACT_TELEGRAM_BOT_TOKEN` | Private Telegram bot token used by queued Contact delivery | Empty until configured |
+| `CONTACT_TELEGRAM_CHAT_ID` | Destination Telegram chat ID for Contact requests | Empty until configured |
 
 The complete list is in [`httpdocs/backend/.env.example`](../httpdocs/backend/.env.example).
 
@@ -55,6 +57,7 @@ Nuxt uses English as the default locale and supports English, Ukrainian, and Rus
 - Store AI provider credentials through the encrypted backend setting.
 - Use production-specific URLs and disable `APP_DEBUG` outside local development.
 - Never put a Passport client secret in Nuxt variables; the browser client is intentionally public.
+- Keep Telegram Contact credentials in the backend environment only; Contact messages are queued and delivered by Laravel.
 
 ## See Also
 

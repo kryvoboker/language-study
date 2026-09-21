@@ -26,10 +26,7 @@ class SocialAuthController extends Controller
         $social_user = Socialite::driver($provider)->user();
         $email = $social_user->getEmail();
         abort_if($email === null, 422, 'The social provider did not return an email address.');
-        $user = User::query()->firstOrCreate(['email' => $email], ['name' => $social_user->getName() ?: $social_user->getNickname() ?: 'User', 'email_verified_at' => now()]);
-        if (! $user->hasVerifiedEmail()) {
-            $user->forceFill(['email_verified_at' => now()])->save();
-        }
+        $user = User::query()->firstOrCreate(['email' => $email], ['name' => $social_user->getName() ?: $social_user->getNickname() ?: 'User']);
         if (! $user->hasAnyRole()) {
             $user->assignRole('user');
         }

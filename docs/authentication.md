@@ -4,11 +4,22 @@
 
 ## Storefront API
 
-Laravel Passport provides OAuth2 authentication for the Nuxt storefront. Protected API routes require a Passport bearer token and verified email status.
+Laravel Passport provides OAuth2 authentication for the Nuxt storefront. Protected API routes require authentication; email verification is currently disabled.
 
 Nuxt exposes a server-side backend-for-frontend (BFF). The BFF stores Passport access and refresh tokens in `HttpOnly`, `SameSite=Lax` cookies; browser code never reads or persists bearer tokens. The public OAuth client uses Authorization Code with PKCE and `S256`.
 
-Supported local flows include registration, login, password reset, signed email verification, and blocked-account checks.
+Supported local flows include registration, login, password reset, and blocked-account checks. Newly registered users can sign in immediately.
+
+### Email verification (temporarily disabled)
+
+Email verification has been removed temporarily and is not required for registration, login, translations, or Filament access. There is no application-wide switch; re-enabling it requires restoring the Laravel `MustVerifyEmail` contract, the signed verification and resend routes, the `verified` route middleware, and Filament's email-verification feature.
+
+Follow the `TODO` comments in these locations when restoring the flow:
+
+- `httpdocs/backend/app/Models/Users/User.php`
+- `httpdocs/backend/routes/web.php` and `httpdocs/backend/routes/api.php`
+- `httpdocs/backend/app/Providers/Filament/AdminPanelProvider.php`
+- `httpdocs/backend/database/migrations/0001_01_01_000000_create_users_table.php` (legacy nullable timestamp retained for now)
 
 Registration and password reset accept passwords from 6 through 32 characters, including special characters. Registration avatars are optional and limited to JPG and PNG images (up to 2 MB); WebP is rejected.
 
@@ -18,9 +29,9 @@ The credential-login endpoint issues personal access tokens. The required person
 php artisan passport:client --personal --provider=users
 ```
 
-Translation requests accept either a valid Passport bearer token or a verified Laravel web session, including a verified Filament admin session. Session-authenticated state-changing requests must include a valid CSRF token.
+Translation requests accept either a valid Passport bearer token or an authenticated Laravel web session, including a Filament admin session. Session-authenticated state-changing requests must include a valid CSRF token.
 
-When the storefront and admin panel use different subdomains, set `SESSION_DOMAIN=.language-study.com` in the backend environment. The Nuxt BFF forwards the browser session cookie to Laravel, allowing a verified admin-panel session to authenticate storefront translation requests.
+When the storefront and admin panel use different subdomains, set `SESSION_DOMAIN=.language-study.com` in the backend environment. The Nuxt BFF forwards the browser session cookie to Laravel, allowing an admin-panel session to authenticate storefront translation requests.
 
 ### Provision the public client
 
@@ -40,7 +51,7 @@ Translation requests additionally require an active, non-blocked account. Anonym
 
 Filament uses Laravel's web guard and session cookies. It does not use Passport for the admin panel.
 
-Admin access requires a verified, non-blocked user with `access_admin_panel`. The `super_admin` role is handled globally by the authorization gate. The dedicated `user` role never grants admin-panel access.
+Admin access requires an active, non-blocked user with `access_admin_panel`; email verification is temporarily disabled and is not part of the access check. The `super_admin` role is handled globally by the authorization gate. The dedicated `user` role never grants admin-panel access.
 
 ## Relevant routes
 
@@ -48,9 +59,7 @@ Admin access requires a verified, non-blocked user with `access_admin_panel`. Th
 |-------|---------|
 | `POST /api/v1/auth/register` | Register a local user |
 | `POST /api/v1/auth/login` | Exchange credentials for a token |
-| `POST /api/v1/auth/email/verification-notification` | Resend verification mail |
 | `POST /api/v1/auth/social/exchange` | Exchange a social-login ticket |
-| `GET /email/verify/{id}/{hash}` | Verify a signed email link |
 | `GET /auth/social/{provider}` | Start a Socialite flow |
 | `GET /auth/social/{provider}/callback` | Receive a provider callback |
 

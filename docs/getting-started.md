@@ -50,10 +50,9 @@ docker compose -f .docker/dev/docker-compose.yml exec language-study-nodejs npm 
 
 1. Open `http://localhost:8080`.
 2. Copy the public client ID from `passport:public-client` into `NUXT_PUBLIC_PASSPORT_CLIENT_ID` and restart Nuxt.
-3. Register a user and open the signed verification link from Mailpit.
-4. Sign in; the BFF keeps Passport tokens in HttpOnly cookies.
-5. Enter source text in the workbench and confirm the request reaches `completed`.
-6. Visit `/docs/api` to inspect the rendered API contract.
+3. Register a user and sign in immediately; the BFF keeps Passport tokens in HttpOnly cookies.
+4. Enter source text in the workbench and confirm the request reaches `completed`.
+5. Visit `/docs/api` to inspect the rendered API contract.
 
 ## Create an administrator
 

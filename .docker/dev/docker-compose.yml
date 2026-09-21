@@ -139,6 +139,39 @@ services:
     networks:
       - language-study-net
 
+#  language-study-postgresql:
+#    build:
+#      context: ${PWD}
+#      dockerfile: .docker/dev/postgresql/Dockerfile
+#      args:
+#        UID: ${UID:-1000}
+#        GID: ${GID:-1000}
+#        UMASK: ${UMASK:-0002}
+#        USERNAME: postgres
+#    image: language-study-postgresql:1.0-alpine
+#    container_name: language-study-postgresql
+#    restart: unless-stopped
+#    healthcheck:
+#      test: [ "CMD-SHELL", "pg_isready --username=$${POSTGRES_SIMPLE_USER} --dbname=$${POSTGRES_DB}" ]
+#      interval: 3s
+#      timeout: 3s
+#      retries: 1
+#    ports:
+#      - "3352:5432"
+#    env_file:
+#      - ../../.docker/dev/env/.env
+#      - ../../.docker/dev/env/.env.postgresql
+#    volumes:
+#      - ../../.db/postgresql:/var/lib/postgresql
+#    init: true # Ensures proper signal handling and zombie reaping
+#    security_opt:
+#      - no-new-privileges:true       # Disables setuid/setgid
+#      - apparmor=docker-default      # Limits syscalls and file system
+#    cap_drop:
+#      - ALL # Removes Linux capabilities
+#    networks:
+#      - language-study-net
+
 networks:
   traefik-network:
     name: traefik-network

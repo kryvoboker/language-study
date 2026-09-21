@@ -68,6 +68,6 @@ class RegisterController extends Controller
 
         event(new Registered($user));
 
-        return response()->json(['message' => 'Account created. Please verify your email.'], 201);
+        return response()->json(['message' => 'Account created. You can now sign in.'], 201);
     }
 }
