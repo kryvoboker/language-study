@@ -148,7 +148,7 @@ export const useTranslationWorkbench = () => {
     }
     errorMessage.value = null
     accessError.value = null
-    debounceTimer = setTimeout(() => void translate(), 650)
+    debounceTimer = setTimeout(() => void translate(), 1000)
   }
 
   return {

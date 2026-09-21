@@ -57,7 +57,8 @@ Authorization: Bearer <passport-access-token>
 {
   "source_text": "on my own",
   "source_language": "en",
-  "target_language": "uk"
+  "target_language": "uk",
+  "locale": "ru"
 }
 ```
 
@@ -70,14 +71,16 @@ The endpoint returns `202 Accepted` with a request resource. Poll it until `comp
   "translation": "самостійно",
   "natural_usage": {
     "expression": "on my own",
-    "example": "I learned how to build this website on my own."
+    "pronunciation": "[он май оун]",
+    "example": "I learned how to build this website on my own.",
+    "example_translation": "Я научился создавать этот сайт самостоятельно."
   },
   "source_corrected": null,
   "issues": []
 }
 ```
 
-`natural_usage` is `null` when the source text is a complete sentence or no useful source-language word or phrase example exists. It contains the source-language expression and one usage example for short lexical inputs. The ready `translation` is returned separately and is not repeated in this object.
+`natural_usage` is `null` when the source text is a complete sentence or no useful source-language word or phrase example exists. For short lexical inputs, it contains the source-language expression, a phonetic respelling of its pronunciation using the user's interface writing system, a source-language usage example, and that example translated into the interface language. Pronunciation is not a semantic translation: English `a cat` should be respelled as `[э кэт]` for Russian readers, not translated as `[это кошка]`. The ready `translation` is returned separately and is not repeated in this object.
 
 ## Request limits
 

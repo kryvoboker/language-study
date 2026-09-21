@@ -75,17 +75,24 @@ const copyTranslation = async () => {
 
         <div v-if="current?.natural_usage || current?.issues?.length" class="border-t border-base-content/10 bg-base-200/20 p-4 sm:p-6">
             <div class="grid gap-4 xl:grid-cols-[0.9fr_1.1fr]">
-                <article v-if="current?.natural_usage" class="rounded-2xl border border-primary/20 bg-primary/5 p-5">
-                    <div class="mb-3 flex items-center gap-2 text-primary"><span class="icon-[tabler--message-language] size-5"/>
+                <article v-if="current?.natural_usage" class="rounded-2xl border border-primary/20 text-primary-content bg-primary/5 p-5">
+                    <div class="mb-3 flex items-center gap-2"><span class="icon-[tabler--message-language] size-5"/>
                         <h3 class="font-semibold">{{ $t('coach.natural') }}</h3></div>
                     <div class="space-y-4">
                         <div class="rounded-xl border border-primary/20 bg-base-100/70 p-4">
-                            <p class="text-xs font-semibold uppercase tracking-[0.16em] text-primary/70">{{ $t('coach.expression') }}</p>
-                            <p class="mt-2 text-xl font-semibold leading-8 text-base-content">{{ current.natural_usage.expression }}</p>
+                            <p class="text-xs font-semibold uppercase tracking-[0.16em]">{{ $t('coach.expression') }}</p>
+                            <p class="mt-2 text-xl font-semibold leading-8 text-primary-content">{{ current.natural_usage.expression }}</p>
+                            <p v-if="current.natural_usage.pronunciation" class="mt-1 text-sm text-primary-content/75">
+                                <span class="sr-only">{{ $t('coach.pronunciation') }}: </span>
+                                {{ current.natural_usage.pronunciation }}
+                            </p>
                         </div>
                         <div class="rounded-xl border border-base-content/10 bg-base-100/60 p-4">
-                            <p class="text-xs font-semibold uppercase tracking-[0.16em] text-base-content/50">{{ $t('coach.example') }}</p>
-                            <p class="mt-2 text-base leading-7 text-base-content/80">{{ current.natural_usage.example }}</p>
+                            <p class="text-xs font-semibold uppercase tracking-[0.16em] text-primary-content/50">{{ $t('coach.example') }}</p>
+                            <p class="mt-2 text-base leading-7 text-primary-content/80">{{ current.natural_usage.example }}</p>
+                            <p v-if="current.natural_usage.example_translation" class="mt-3 border-t border-base-content/10 pt-3 text-sm leading-6 text-primary-content/60">
+                                {{ current.natural_usage.example_translation }}
+                            </p>
                         </div>
                     </div>
                 </article>
@@ -94,12 +101,23 @@ const copyTranslation = async () => {
                         <div class="flex items-center gap-2"><span class="icon-[tabler--school] size-5 text-secondary"/>
                             <h3 class="font-semibold">{{ $t('coach.title') }}</h3></div>
                         <span class="badge badge-soft badge-secondary">{{ current?.issues?.length ?? 0 }} {{ $t('coach.notes') }}</span></div>
-                    <div v-if="current?.source_corrected" class="mb-4 rounded-xl bg-base-200/45 p-3"><p class="text-xs text-base-content/50">{{ $t('coach.corrected') }}</p>
+                    <div v-if="current?.source_corrected" class="mb-4 rounded-xl bg-base-200/45 p-3"><p class="text-xs text-primary-content/50">{{ $t('coach.corrected') }}</p>
                         <p class="mt-1 text-sm">{{ current.source_corrected }}</p></div>
                     <div v-if="current?.issues?.length" class="space-y-3">
                         <div v-for="(issue, index) in current.issues" :key="`${issue.original}-${index}`" class="rounded-xl border border-base-content/10 p-3">
-                            <div class="mb-2 flex flex-wrap items-center gap-2"><span class="badge badge-sm" :class="issue.severity === 'error' ? 'badge-error' : issue.severity === 'warning' ? 'badge-warning' : 'badge-info'">{{ issue.type }}</span><span class="text-sm text-error line-through">{{ issue.original }}</span><span class="icon-[tabler--arrow-right] size-3 text-base-content/35"/><span class="text-sm text-success">{{ issue.correction }}</span></div>
-                            <p class="text-sm leading-6 text-base-content/65">{{ issue.explanation }}</p>
+                            <div class="mb-2 flex flex-wrap items-center gap-2">
+                                <span class="badge badge-sm" :class="issue.severity === 'error' ? 'badge-error' : issue.severity === 'warning' ? 'badge-warning' : 'badge-info'">
+                                    {{ issue.type }}
+                                </span>
+                                <span class="text-sm text-error line-through">
+                                    {{ issue.original }}
+                                </span>
+                                <span class="icon-[tabler--arrow-right] size-3 text-primary-content/35"/>
+                                <span class="text-sm text-success">
+                                    {{ issue.correction }}
+                                </span>
+                            </div>
+                            <p class="text-sm leading-6 text-primary-content/65">{{ issue.explanation }}</p>
                         </div>
                     </div>
                     <p v-else class="text-sm text-success"><span class="icon-[tabler--circle-check] me-1 inline size-4"/>{{ $t('coach.clean') }}</p>

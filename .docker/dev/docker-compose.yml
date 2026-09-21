@@ -172,6 +172,36 @@ services:
 #    networks:
 #      - language-study-net
 
+#  language-study-redis:
+#    build:
+#      context: ${PWD}
+#      dockerfile: .docker/dev/redis/Dockerfile
+#      args:
+#        UID: ${UID:-1000}
+#        GID: ${GID:-1000}
+#        UMASK: ${UMASK:-0002}
+#        USERNAME: redis
+#    image: language-study-redis:1.0-alpine
+#    container_name: language-study-redis
+#    restart: unless-stopped
+#    ports:
+#      - "42610:6379"
+#    healthcheck:
+#      test: [ "CMD", "redis-cli", "ping" ]
+#      interval: 5s
+#      timeout: 3s
+#      retries: 5
+#    volumes:
+#      - ../../.db/redis:/data
+#    init: true # Ensures proper signal handling and zombie reaping
+#    security_opt:
+#      - no-new-privileges:true
+#      - apparmor=docker-default
+#    cap_drop:
+#      - ALL # Removes Linux capabilities
+#    networks:
+#      - language-study-net
+
 networks:
   traefik-network:
     name: traefik-network

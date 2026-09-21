@@ -178,7 +178,9 @@ class TranslationAuthenticationTest extends TestCase
                 'translation' => 'самостоятельно',
                 'natural_usage' => [
                     'expression' => 'on my own',
+                    'pronunciation' => '[он май оун]',
                     'example' => 'I learned this on my own.',
+                    'example_translation' => 'Я выучил это самостоятельно.',
                 ],
             ],
             'completed_at' => now(),
@@ -194,7 +196,9 @@ class TranslationAuthenticationTest extends TestCase
             ->assertOk()
             ->assertJsonPath('translation', 'самостоятельно')
             ->assertJsonPath('natural_usage.expression', 'on my own')
-            ->assertJsonPath('natural_usage.example', 'I learned this on my own.');
+            ->assertJsonPath('natural_usage.pronunciation', '[он май оун]')
+            ->assertJsonPath('natural_usage.example', 'I learned this on my own.')
+            ->assertJsonPath('natural_usage.example_translation', 'Я выучил это самостоятельно.');
 
         Queue::assertNothingPushed();
     }
