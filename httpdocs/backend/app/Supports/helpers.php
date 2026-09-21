@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use Carbon\Carbon;
+use Carbon\CarbonInterface;
 use Illuminate\Support\Facades\Log;
 
 if (!function_exists('string_value')) {
@@ -373,5 +375,36 @@ if (!function_exists('log_stack_trace')) {
         }
 
         return $log_message;
+    }
+}
+
+if (!function_exists('get_now_date')) {
+    /**
+     * @param string|null $time_zone
+     *
+     * @return Carbon|CarbonInterface
+     */
+    function get_now_date(?string $time_zone = null): Carbon|CarbonInterface
+    {
+        return now($time_zone ?: string_value(config('app.timezone')));
+    }
+}
+
+if (!function_exists('resolve_upload_path_placeholders')) {
+    /**
+     * @param string|null $path
+     *
+     * @return string
+     */
+    function resolve_upload_path_placeholders(?string $path): string
+    {
+        $normalized_path = (string)$path;
+        $now_date = get_now_date();
+
+        return Str::replace(
+            ['{year}', '{month}'],
+            [$now_date->format('Y'), $now_date->format('m')],
+            $normalized_path,
+        );
     }
 }

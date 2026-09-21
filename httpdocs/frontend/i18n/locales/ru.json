@@ -42,7 +42,16 @@
     "loginHint": "Продолжите через защищённый Laravel OAuth flow.",
     "continueWith": "Продолжить через",
     "pkceHint": "Storefront спроектирован для Passport Authorization Code + PKCE.",
-    "create": "Создать аккаунт"
+    "create": "Создать аккаунт",
+    "name": "Имя",
+    "email": "Электронная почта",
+    "password": "Пароль",
+    "passwordHelp": "От 6 до 32 символов. Специальные символы разрешены.",
+    "passwordConfirmation": "Подтвердите пароль",
+    "avatarOptional": "Изображение профиля (необязательно)",
+    "avatarHelp": "JPG или PNG; не более 2 МБ.",
+    "registrationSuccess": "Аккаунт создан. Проверьте почту — мы отправили ссылку для подтверждения.",
+    "registrationFailed": "Не удалось создать аккаунт. Проверьте данные и попробуйте снова."
   },
   "account": {
     "title": "Мой аккаунт",

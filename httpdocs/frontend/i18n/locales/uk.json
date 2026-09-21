@@ -42,7 +42,16 @@
     "loginHint": "Продовжуйте через захищений Laravel OAuth flow.",
     "continueWith": "Продовжити через",
     "pkceHint": "Storefront спроєктований для Passport Authorization Code + PKCE.",
-    "create": "Створити акаунт"
+    "create": "Створити акаунт",
+    "name": "Ім’я",
+    "email": "Електронна пошта",
+    "password": "Пароль",
+    "passwordHelp": "Від 6 до 32 символів. Спеціальні символи дозволені.",
+    "passwordConfirmation": "Підтвердіть пароль",
+    "avatarOptional": "Зображення профілю (необов’язково)",
+    "avatarHelp": "JPG або PNG; не більше 2 МБ.",
+    "registrationSuccess": "Акаунт створено. Перевірте пошту — ми надіслали посилання для підтвердження.",
+    "registrationFailed": "Не вдалося створити акаунт. Перевірте дані й спробуйте ще раз."
   },
   "account": {
     "title": "Мій акаунт",

@@ -10,6 +10,8 @@ Nuxt exposes a server-side backend-for-frontend (BFF). The BFF stores Passport a
 
 Supported local flows include registration, login, password reset, signed email verification, and blocked-account checks.
 
+Registration and password reset accept passwords from 6 through 32 characters, including special characters. Registration avatars are optional and limited to JPG and PNG images (up to 2 MB); WebP is rejected.
+
 The credential-login endpoint issues personal access tokens. The required personal client is provisioned for the `users` provider with:
 
 ```bash
@@ -30,7 +32,9 @@ php artisan passport:public-client
 
 Copy the printed client ID to `NUXT_PUBLIC_PASSPORT_CLIENT_ID`. The redirect URI must exactly match the backend and frontend environment values.
 
-Social sign-in uses Laravel Socialite. Google, GitHub, and Facebook callbacks create or link a local user and issue a single-use, 60-second exchange ticket. The ticket is exchanged for a Passport token so a bearer token is not placed in the callback URL.
+Social sign-in uses Laravel Socialite. The storefront login page offers Google sign-in; GitHub and Facebook are not offered there. The existing backend Socialite routes remain available for integrations that call them directly. Social callbacks create or link a local user and issue a single-use, 60-second exchange ticket. The ticket is exchanged for a Passport token so a bearer token is not placed in the callback URL.
+
+Translation requests additionally require an active, non-blocked account. Anonymous and inactive callers receive `401` with `code: login_required`; blocked callers receive `403` with `code: account_blocked`. The storefront maps these codes to localized sign-in and support guidance.
 
 ## Admin panel
 

@@ -36,6 +36,12 @@ Translation endpoints accept either a Passport bearer token or an authenticated 
 | `GET` | `/translation-requests/{translation_request}` | Read status or result |
 | `DELETE` | `/translation-requests/{translation_request}` | Cancel a request |
 
+Translation access errors use stable `code` values. Anonymous and inactive users receive `401` with `login_required`; the storefront asks them to sign in. Blocked users receive `403` with `account_blocked`; the storefront explains the restriction and directs them to technical support. These checks apply to creating, polling, and cancelling translation requests.
+
+## Register a user
+
+`POST /api/v1/auth/register` accepts `multipart/form-data`. `name`, `email`, `password`, and `password_confirmation` are required; passwords must contain 6–32 characters, may include special characters, and require a matching confirmation. Password resets use the same length limits. `avatar` is optional and accepts JPG or PNG images up to 2 MB. Uploaded avatars are stored under the date-resolved `app.user_dir` path in `images/avatar/`.
+
 ## Create a translation request
 
 ```http
