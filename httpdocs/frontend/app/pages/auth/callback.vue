@@ -1,11 +1,12 @@
 <script setup lang="ts">
 const errorMessage = ref('')
+const localePath = useLocalePath()
 
 onMounted(async () => {
   try {
     const route = useRoute()
     await $fetch('/api/auth/pkce/callback', { query: route.query })
-    await navigateTo('/')
+    await navigateTo(localePath('/'))
   } catch {
     errorMessage.value = 'Authorization expired or was denied. Please try again.'
   }
@@ -17,7 +18,7 @@ onMounted(async () => {
     <div class="text-center">
       <span v-if="!errorMessage" class="loading loading-spinner loading-lg" />
       <p v-else class="text-error">{{ errorMessage }}</p>
-      <NuxtLink v-if="errorMessage" class="link link-primary" to="/login">Return to sign in</NuxtLink>
+      <NuxtLink v-if="errorMessage" class="link link-primary" :to="localePath('/login')">Return to sign in</NuxtLink>
     </div>
   </div>
 </template>

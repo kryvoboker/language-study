@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace httpdocs\backend\phpcs\ProjectStandard\Sniffs\Naming;
 
+use PHP_CodeSniffer\Files\File;
 use PHP_CodeSniffer\Sniffs\Sniff;
 
 // PHPCS uses global token constants and its own runtime classes.
@@ -72,7 +73,7 @@ final class NamingConventionSniff implements Sniff
         ];
     }
 
-    public function process(File $phpcsFile, $stackPtr): void
+    public function process(File $phpcsFile, int $stackPtr): void
     {
         $tokens = $phpcsFile->getTokens();
 

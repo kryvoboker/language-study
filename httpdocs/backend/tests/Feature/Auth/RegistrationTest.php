@@ -24,7 +24,7 @@ class RegistrationTest extends TestCase
         Event::fake([Registered::class]);
     }
 
-    public function test_user_can_register_without_an_avatar_and_receives_verification_event(): void
+    public function test_user_can_register_without_an_avatar_and_sign_in_without_email_verification(): void
     {
         $response = $this->postJson('/api/v1/auth/register', [
             'name' => 'Study User',
@@ -33,12 +33,12 @@ class RegistrationTest extends TestCase
             'password_confirmation' => 'secure-password',
         ]);
 
-        $response->assertCreated();
+        $response->assertCreated()->assertJsonPath('message', 'Account created. You can now sign in.');
 
         $user = User::query()->where('email', 'study-user@example.test')->firstOrFail();
         $this->assertSame('Study User', $user->name);
         $this->assertNull($user->avatar);
-        $this->assertFalse($user->hasVerifiedEmail());
+        $this->assertNull($user->email_verified_at);
         $this->assertTrue($user->hasRole('user'));
         Event::assertDispatched(Registered::class);
     }

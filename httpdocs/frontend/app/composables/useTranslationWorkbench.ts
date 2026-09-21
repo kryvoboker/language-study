@@ -4,8 +4,18 @@ export const useTranslationWorkbench = () => {
   const { t, locale } = useI18n()
   const { user } = useAuth()
   const sourceText = ref('')
-  const sourceLanguage = ref('en')
-  const targetLanguage = ref('uk')
+  const sourceLanguage = useCookie('nativelens.source-language', {
+    default: () => 'en',
+    maxAge: 60 * 60 * 24 * 365,
+    path: '/',
+    sameSite: 'lax',
+  })
+  const targetLanguage = useCookie('nativelens.target-language', {
+    default: () => 'uk',
+    maxAge: 60 * 60 * 24 * 365,
+    path: '/',
+    sameSite: 'lax',
+  })
   const current = ref<TranslationRequestDto | null>(null)
   const isBusy = computed(() => current.value?.status === 'queued' || current.value?.status === 'processing')
   const errorMessage = ref<string | null>(null)
@@ -138,7 +148,7 @@ export const useTranslationWorkbench = () => {
     }
     errorMessage.value = null
     accessError.value = null
-    debounceTimer = setTimeout(() => void translate(), 650)
+    debounceTimer = setTimeout(() => void translate(), 1000)
   }
 
   return {

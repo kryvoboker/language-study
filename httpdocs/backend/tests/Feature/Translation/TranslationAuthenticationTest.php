@@ -18,7 +18,7 @@ class TranslationAuthenticationTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_verified_passport_user_can_create_a_translation_request(): void
+    public function test_active_passport_user_can_create_a_translation_request_without_email_verification(): void
     {
         Queue::fake();
         $user = User::factory()->create(['is_active' => true]);
@@ -32,7 +32,7 @@ class TranslationAuthenticationTest extends TestCase
         $this->assertDatabaseHas('translation_requests', ['locale' => 'ru']);
     }
 
-    public function test_verified_filament_session_user_can_create_a_translation_request_with_csrf(): void
+    public function test_active_filament_session_user_can_create_a_translation_request_with_csrf(): void
     {
         Queue::fake();
         $user = User::factory()->create(['is_active' => true]);
@@ -178,7 +178,9 @@ class TranslationAuthenticationTest extends TestCase
                 'translation' => 'самостоятельно',
                 'natural_usage' => [
                     'expression' => 'on my own',
+                    'pronunciation' => '[он май оун]',
                     'example' => 'I learned this on my own.',
+                    'example_translation' => 'Я выучил это самостоятельно.',
                 ],
             ],
             'completed_at' => now(),
@@ -194,7 +196,9 @@ class TranslationAuthenticationTest extends TestCase
             ->assertOk()
             ->assertJsonPath('translation', 'самостоятельно')
             ->assertJsonPath('natural_usage.expression', 'on my own')
-            ->assertJsonPath('natural_usage.example', 'I learned this on my own.');
+            ->assertJsonPath('natural_usage.pronunciation', '[он май оун]')
+            ->assertJsonPath('natural_usage.example', 'I learned this on my own.')
+            ->assertJsonPath('natural_usage.example_translation', 'Я выучил это самостоятельно.');
 
         Queue::assertNothingPushed();
     }

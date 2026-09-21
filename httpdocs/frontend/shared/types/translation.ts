@@ -10,7 +10,9 @@ export interface LanguageIssue {
 
 export interface NaturalVariant {
   expression: string
+  pronunciation: string
   example: string
+  example_translation: string
 }
 
 export interface TranslationRequestDto {

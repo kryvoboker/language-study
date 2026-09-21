@@ -8,7 +8,6 @@ use App\Models\AiProviderSetting;
 use Database\Factories\UserFactory;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -19,7 +18,8 @@ use Spatie\Permission\Traits\HasRoles;
 /**
  * @property int|null $ai_provider_id
  */
-class User extends Authenticatable implements FilamentUser, MustVerifyEmail, OAuthenticatable
+// TODO: Implement MustVerifyEmail again when email verification is re-enabled.
+class User extends Authenticatable implements FilamentUser, OAuthenticatable
 {
     use HasApiTokens;
     /** @use HasFactory<UserFactory> */
@@ -47,7 +47,6 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail, OAu
     protected function casts(): array
     {
         return [
-            'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'is_blocked' => 'boolean',
             'is_active' => 'boolean',
@@ -58,7 +57,6 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail, OAu
     {
         return $this->is_active
             && !$this->is_blocked
-            && $this->hasVerifiedEmail()
             && !$this->hasRole('user')
             && $this->can('access_admin_panel');
     }

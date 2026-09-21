@@ -20,9 +20,6 @@ class LoginController extends Controller
         if ($user === null || $user->is_blocked || ! Hash::check($data['password'], (string) $user->password)) {
             abort(422, 'Invalid credentials.');
         }
-        if (! $user->hasVerifiedEmail()) {
-            abort(403, 'Email verification is required.');
-        }
         return response()->json(['access_token' => $user->createToken('storefront')->accessToken, 'token_type' => 'Bearer']);
     }
 }

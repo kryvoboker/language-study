@@ -17,7 +17,7 @@ Filament Shield and Spatie Permission own roles and permissions.
 `User::canAccessPanel()` requires all of the following:
 
 - the account is not blocked
-- the email is verified
+- the account is active
 - the user has `access_admin_panel`
 - the user is not assigned the `user` role
 
@@ -28,7 +28,7 @@ Assigning `user` removes admin access immediately. The Filament User form expose
 - Grant the smallest set of Shield permissions needed for a role.
 - Reserve `super_admin` for trusted operators.
 - Add multi-factor authentication before production admin use.
-- Review blocked and unverified accounts before granting access.
+- Review blocked and inactive accounts before granting access.
 
 ## See Also
 

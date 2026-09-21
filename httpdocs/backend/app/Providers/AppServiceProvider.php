@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Domain\Contact\Contracts\ContactTelegramGateway;
+use App\Domain\Contact\Services\LongmanContactTelegramGateway;
 use App\Models\Users\User;
 use Carbon\CarbonInterval;
 use Illuminate\Support\Facades\Gate;
@@ -15,6 +17,8 @@ class AppServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
+        $this->app->bind(ContactTelegramGateway::class, LongmanContactTelegramGateway::class);
+
         $new_storage_path = string_value(config('filesystems.new_storage_path'));
 
         if ($new_storage_path) {

@@ -28,10 +28,10 @@ class WebLoginController extends Controller
 
         $user = $request->user();
 
-        if (! $user instanceof User || ! $user->hasVerifiedEmail()) {
+        if (! $user instanceof User) {
             Auth::guard('web')->logout();
 
-            return back()->withErrors(['email' => 'Please verify your email address first.'])->onlyInput('email');
+            return back()->withErrors(['email' => 'Unable to sign in with these credentials.'])->onlyInput('email');
         }
 
         return redirect()->intended('/');

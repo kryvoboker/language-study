@@ -27,13 +27,15 @@
 
 ## Natural variant response
 
-For a single word or phrase, the provider may return a `natural_usage` object with the source-language expression and one source-language usage example:
+For a single word or phrase, the provider may return a `natural_usage` object with the source-language expression, a phonetic respelling of its pronunciation using the user's interface writing system, a source-language usage example, and the example's translation into the user's interface locale. The pronunciation is about sound, not meaning: for English `a cat` with Russian as the interface locale, it should be `[э кэт]`, not `[это кошка]`.
 
 ```json
 {
   "natural_usage": {
     "expression": "on my own",
-    "example": "I learned how to build this website on my own."
+    "pronunciation": "[он май оун]",
+    "example": "I learned how to build this website on my own.",
+    "example_translation": "Я научился создавать этот сайт самостоятельно."
   }
 }
 ```

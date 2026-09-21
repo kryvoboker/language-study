@@ -2,6 +2,8 @@ export interface AuthUser {
   id: string
   name: string
   email: string
+  is_blocked: boolean
+  is_active: boolean
   max_input_characters: number
 }
 

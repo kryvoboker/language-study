@@ -6,7 +6,7 @@ The API is versioned under `/api/v1`. The complete OpenAPI 3.1 contract is [`ope
 
 ## Authentication
 
-Protected routes require authentication and verified email. Most use a Passport bearer token; translation routes also accept an authenticated Laravel web session. Public authentication routes are rate-limited separately.
+Protected routes require authentication but do not require email verification. Email verification is temporarily disabled; consult the `TODO` comments in the User model, API/web routes, and Filament panel provider before restoring it. Most protected API routes use a Passport bearer token; translation routes also accept an authenticated Laravel web session. Public authentication routes are rate-limited separately.
 
 ```http
 Authorization: Bearer <passport-access-token>
@@ -23,11 +23,10 @@ For the Nuxt storefront, callers use same-origin BFF routes; the BFF adds this h
 | `POST` | `/auth/social/exchange` | Public | Exchange a one-time social ticket |
 | `POST` | `/auth/forgot-password` | Public | Send a reset link |
 | `POST` | `/auth/reset-password` | Public | Set a new password |
-| `POST` | `/auth/email/verification-notification` | Passport + unverified | Resend verification mail |
 
 ## User and translation endpoints
 
-Translation endpoints accept either a Passport bearer token or an authenticated Laravel web session (including the Filament admin session). The user must have a verified email, be active, and not be blocked. Session-authenticated state-changing requests must include a valid CSRF token.
+Translation endpoints accept either a Passport bearer token or an authenticated Laravel web session (including the Filament admin session). The user must be active and not be blocked. Session-authenticated state-changing requests must include a valid CSRF token.
 
 | Method | Endpoint | Purpose |
 |--------|----------|---------|
@@ -37,6 +36,12 @@ Translation endpoints accept either a Passport bearer token or an authenticated 
 | `DELETE` | `/translation-requests/{translation_request}` | Cancel a request |
 
 Translation access errors use stable `code` values. Anonymous and inactive users receive `401` with `login_required`; the storefront asks them to sign in. Blocked users receive `403` with `account_blocked`; the storefront explains the restriction and directs them to technical support. These checks apply to creating, polling, and cancelling translation requests.
+
+## Contact requests
+
+`POST /api/v1/contact-requests` accepts guests and authenticated users, including inactive and blocked accounts. Guest requests require `first_name`, `last_name`, and `email`; authenticated requests use the account identity and reject client-supplied identity fields. Every request requires a `message` (up to 10,000 characters) and may include up to 10 JPEG or PNG images, each no larger than 5 MB. Attachments are stored on Laravel's private local disk.
+
+The endpoint returns `202 Accepted` after persisting the request and attachments. Telegram delivery happens asynchronously in the backend; the storefront reports durable acceptance, not Telegram delivery. Blocked-user submissions are marked in the stored request and explicitly labeled in Telegram. Configure `CONTACT_TELEGRAM_BOT_TOKEN` and `CONTACT_TELEGRAM_CHAT_ID` in the backend environment. Never expose these values to Nuxt or browser code. Contact requests are rate-limited to 5 submissions per minute.
 
 ## Register a user
 
@@ -52,7 +57,8 @@ Authorization: Bearer <passport-access-token>
 {
   "source_text": "on my own",
   "source_language": "en",
-  "target_language": "uk"
+  "target_language": "uk",
+  "locale": "ru"
 }
 ```
 
@@ -65,14 +71,16 @@ The endpoint returns `202 Accepted` with a request resource. Poll it until `comp
   "translation": "самостійно",
   "natural_usage": {
     "expression": "on my own",
-    "example": "I learned how to build this website on my own."
+    "pronunciation": "[он май оун]",
+    "example": "I learned how to build this website on my own.",
+    "example_translation": "Я научился создавать этот сайт самостоятельно."
   },
   "source_corrected": null,
   "issues": []
 }
 ```
 
-`natural_usage` is `null` when the source text is a complete sentence or no useful source-language word or phrase example exists. It contains the source-language expression and one usage example for short lexical inputs. The ready `translation` is returned separately and is not repeated in this object.
+`natural_usage` is `null` when the source text is a complete sentence or no useful source-language word or phrase example exists. For short lexical inputs, it contains the source-language expression, a phonetic respelling of its pronunciation using the user's interface writing system, a source-language usage example, and that example translated into the interface language. Pronunciation is not a semantic translation: English `a cat` should be respelled as `[э кэт]` for Russian readers, not translated as `[это кошка]`. The ready `translation` is returned separately and is not repeated in this object.
 
 ## Request limits
 

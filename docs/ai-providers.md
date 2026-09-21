@@ -83,7 +83,7 @@ Provider keys are matched case-insensitively and with surrounding whitespace ign
 
 The prompt instruction is stored per provider setting, so different assistants can use different translation and language-coaching behavior. Existing settings without an instruction continue to use the built-in compatibility instruction until they are edited.
 
-The translation response keeps the ready `translation` separate from the optional `natural_usage` object. For a short word or phrase, the object contains `expression` and one source-language `example`; for a complete sentence or an input without a useful lexical example, it is `null`. The OpenAI adapter enforces this shape through its strict JSON schema and does not support legacy stored result formats while the project is under development.
+The translation response keeps the ready `translation` separate from the optional `natural_usage` object. For a short word or phrase, the object contains `expression`, `pronunciation`, a source-language `example`, and its `example_translation`. `pronunciation` is a phonetic respelling of the source-language expression in the writing system familiar to the user's interface locale, not a translation or definition (for example, English `a cat` is `[э кэт]`, not `[это кошка]` for Russian readers). `example_translation` is the example sentence translated into that locale. For a complete sentence or an input without a useful lexical example, `natural_usage` is `null`. The OpenAI adapter enforces this shape through its strict JSON schema and does not support legacy stored result formats while the project is under development.
 
 ## Adding a provider
 

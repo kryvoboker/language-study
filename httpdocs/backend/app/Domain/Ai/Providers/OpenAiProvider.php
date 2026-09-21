@@ -171,12 +171,21 @@ final class OpenAiProvider implements AiProviderContract
             ? $setting->prompt_instruction
             : <<<'PROMPT'
 You are a translation engine and language coach. Return only schema-valid JSON.
-Translate faithfully into the requested target language. Independently evaluate the source text for grammar, spelling, punctuation and unnatural phrasing. For a single source-language word or phrase, provide a natural usage example in the source language; for a sentence or when no useful lexical example exists, return null for natural_usage. Never repeat the translation in natural_usage. Provide one corrected source version and concise educational issues. Do not invent errors. Preserve names, URLs, code, numbers and intended tone.
+Translate faithfully into the requested target language. Independently evaluate the source text for grammar, spelling, punctuation and unnatural phrasing.
+For a single source-language word or phrase, provide a source-language usage example, a phonetic respelling of how the source-language expression sounds using the user's locale writing system, and a translation of the example into the user's locale.
+For a sentence or when no useful lexical example exists, return null for natural_usage.
+When natural_usage is an object, include expression, pronunciation, example, and example_translation.
+Never repeat the main translation in natural_usage. Provide one corrected source version and concise educational issues.
+Do not invent errors. Preserve names, URLs, code, numbers and intended tone.
 PROMPT;
 
+        $locale = Str::upper($locale);
+
         return Str::finish($instructions, "\n")
-            . 'natural_usage must contain the source-language expression and one source-language usage example when applicable. '
-            . "Provide error messages to the user only in $locale.";
+            . 'When natural_usage is an object, it must contain expression, pronunciation, example, and example_translation. '
+            . "Provide error messages to the user only in $locale. "
+            . "For natural_usage.pronunciation, write only an approximate phonetic rendering of how natural_usage.expression is spoken in its source language, using the writing system familiar to a $locale reader and enclosing it in square brackets. Never translate or define the expression in this field. For example, for the English expression \"a cat\" with locale RU, use \"[э кэт]\", not \"[это кошка]\". "
+            . "Translate the natural_usage.example sentence into $locale only and return it as natural_usage.example_translation.";
     }
 
     /** @return array<string, mixed> */
@@ -192,10 +201,12 @@ PROMPT;
                 'natural_usage' => [
                     'type' => ['object', 'null'],
                     'additionalProperties' => false,
-                    'required' => ['expression', 'example'],
+                    'required' => ['expression', 'pronunciation', 'example', 'example_translation'],
                     'properties' => [
                         'expression' => ['type' => 'string'],
+                        'pronunciation' => ['type' => 'string'],
                         'example' => ['type' => 'string'],
+                        'example_translation' => ['type' => 'string'],
                     ],
                 ],
                 'issues' => [

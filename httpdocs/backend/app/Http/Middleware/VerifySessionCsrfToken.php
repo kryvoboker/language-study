@@ -18,7 +18,7 @@ final class VerifySessionCsrfToken extends PreventRequestForgery
      */
     public function handle($request, Closure $next)
     {
-        if (Auth::guard('api')->user() !== null) {
+        if (Auth::guard('api')->user() !== null || Auth::guard('web')->user() === null) {
             return $next($request);
         }
 
