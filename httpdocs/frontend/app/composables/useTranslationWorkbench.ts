@@ -9,6 +9,7 @@ export const useTranslationWorkbench = () => {
   const current = ref<TranslationRequestDto | null>(null)
   const isBusy = computed(() => current.value?.status === 'queued' || current.value?.status === 'processing')
   const errorMessage = ref<string | null>(null)
+  const accessError = ref<'loginRequired' | 'accountBlocked' | null>(null)
   const inputCharacterLimit = computed(() => user.value?.max_input_characters ?? 12000)
 
   const setLimitError = () => {
@@ -80,6 +81,7 @@ export const useTranslationWorkbench = () => {
       return
     }
     errorMessage.value = null
+    accessError.value = null
     const runSequence = ++sequence
     try {
       const result = await requestWithAuthRecovery<TranslationRequestDto>('/api/v1/translation-requests', {
@@ -98,18 +100,29 @@ export const useTranslationWorkbench = () => {
       if (runSequence !== sequence) return
       const requestError = error as {
         statusCode?: number
-        data?: { errors?: { source_text?: unknown[] } }
+        data?: {
+          code?: string
+          errors?: { source_text?: unknown[] }
+          data?: { code?: string; errors?: { source_text?: unknown[] } }
+        }
       }
+      const errorCode = requestError.data?.code ?? requestError.data?.data?.code
+      const validationErrors = requestError.data?.errors ?? requestError.data?.data?.errors
 
-      if (requestError.statusCode === 422 && requestError.data?.errors?.source_text) {
+      if (requestError.statusCode === 422 && validationErrors?.source_text) {
         setLimitError()
         return
       }
 
-      errorMessage.value =
-        requestError.statusCode === 401
-          ? 'Your session has expired. Please sign in again.'
-          : 'Translation request failed.'
+      if (errorCode === 'account_blocked') {
+        accessError.value = 'accountBlocked'
+        errorMessage.value = t('translator.accountBlocked')
+      } else if (requestError.statusCode === 401 || errorCode === 'login_required') {
+        accessError.value = 'loginRequired'
+        errorMessage.value = t('translator.loginRequired')
+      } else {
+        errorMessage.value = 'Translation request failed.'
+      }
     }
   }
 
@@ -124,6 +137,7 @@ export const useTranslationWorkbench = () => {
       return
     }
     errorMessage.value = null
+    accessError.value = null
     debounceTimer = setTimeout(() => void translate(), 650)
   }
 
@@ -134,6 +148,7 @@ export const useTranslationWorkbench = () => {
     current,
     isBusy,
     errorMessage,
+    accessError,
     inputCharacterLimit,
     schedule,
     cancelCurrent,

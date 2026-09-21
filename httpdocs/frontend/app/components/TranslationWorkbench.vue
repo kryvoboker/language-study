@@ -1,6 +1,6 @@
 <script setup lang="ts">
 const {
-  sourceText, sourceLanguage, targetLanguage, current, isBusy, errorMessage, inputCharacterLimit, schedule, translate,
+  sourceText, sourceLanguage, targetLanguage, current, isBusy, errorMessage, accessError, inputCharacterLimit, schedule, translate,
 } = useTranslationWorkbench()
 
 const languages = [
@@ -41,7 +41,14 @@ const copyTranslation = async () => {
         <div v-if="isBusy" class="space-y-3 pt-3"><div class="skeleton h-6 w-11/12"/><div class="skeleton h-6 w-9/12"/><div class="skeleton h-6 w-10/12"/></div>
         <p v-else-if="current?.translation" class="whitespace-pre-wrap text-xl leading-relaxed">{{ current.translation }}</p>
         <div v-else class="grid h-64 place-items-center text-center text-base-content/35"><div><span class="icon-[tabler--text-recognition] mx-auto mb-3 size-8"/><p>{{ $t('translator.empty') }}</p></div></div>
-        <div v-if="errorMessage" class="alert alert-soft alert-error mt-4">{{ errorMessage }}</div>
+        <div v-if="errorMessage" class="alert alert-soft alert-error mt-4">
+          <div>
+            <p>{{ errorMessage }}</p>
+            <NuxtLink v-if="accessError === 'loginRequired'" to="/login" class="link link-primary mt-2 inline-block">
+              {{ $t('nav.login') }}
+            </NuxtLink>
+          </div>
+        </div>
       </div>
     </div>
 

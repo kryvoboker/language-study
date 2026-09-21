@@ -21,7 +21,9 @@
     "empty": "Your translation will appear here.",
     "analyzing": "Analyzing language…",
     "ready": "Ready",
-    "limitError": "Text exceeds the {limit} character limit."
+    "limitError": "Text exceeds the {limit} character limit.",
+    "loginRequired": "Please sign in to your account before translating text.",
+    "accountBlocked": "Your account is blocked and can no longer use this service. Contact technical support to resolve this issue."
   },
   "coach": {
     "natural": "How native speakers say it",

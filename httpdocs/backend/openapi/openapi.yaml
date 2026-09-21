@@ -30,6 +30,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TranslationRequest'
+        '401':
+          description: Sign-in required (anonymous or inactive account)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessError'
+        '403':
+          description: Account is blocked
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessError'
   /translation-requests/{translationRequest}:
     parameters:
       - name: translationRequest
@@ -47,11 +59,35 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TranslationRequest'
+        '401':
+          description: Sign-in required (anonymous or inactive account)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessError'
+        '403':
+          description: Account is blocked
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessError'
     delete:
       summary: Cancel translation request
       responses:
         '204':
           description: Cancelled or already terminal
+        '401':
+          description: Sign-in required (anonymous or inactive account)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessError'
+        '403':
+          description: Account is blocked
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessError'
   /auth/login:
     post:
       security: []
@@ -128,6 +164,14 @@ components:
             profile: Read own profile
             translate: Create and manage own translations
   schemas:
+    AccessError:
+      type: object
+      required: [code, message]
+      properties:
+        code:
+          type: string
+          enum: [login_required, account_blocked]
+        message: { type: string }
     CreateTranslationRequest:
       type: object
       required: [source_text, source_language, target_language]
