@@ -15,28 +15,28 @@ use Livewire\Attributes\Locked;
 
 class EditAiProviderSetting extends EditRecord
 {
-	protected static string                        $resource = AiProviderSettingResource::class;
-	#[Locked]
-	public int|string|Model|null|AiProviderSetting $record   = null;
+    protected static string                        $resource = AiProviderSettingResource::class;
+    #[Locked]
+    public int|string|Model|null|AiProviderSetting $record = null;
 
-	protected function getHeaderActions(): array
-	{
-		$actions = [
-			Action::make('save')
-				->label(__('admin/default.buttons.save'))
-				->icon(Heroicon::CheckCircle)
-				->action(fn() => $this->save()),
-			$this->getCancelFormAction()
-				->label(__('admin/default.buttons.cancel'))
-				->icon(Heroicon::ArrowLeftOnRectangle),
-		];
+    protected function getHeaderActions(): array
+    {
+        $actions = [
+            Action::make('save')
+                ->label(__('admin/default.buttons.save'))
+                ->icon(Heroicon::CheckCircle)
+                ->action(fn () => $this->save()),
+            $this->getCancelFormAction()
+                ->label(__('admin/default.buttons.cancel'))
+                ->icon(Heroicon::ArrowLeftOnRectangle),
+        ];
 
-		if ($this->record->is_default === false) {
-			$actions[] = DeleteAction::make('delete')
-				->label(__('admin/default.buttons.delete'))
-				->icon(Heroicon::Trash);
-		}
+        if ($this->record->is_default === false) {
+            $actions[] = DeleteAction::make('delete')
+                ->label(__('admin/default.buttons.delete'))
+                ->icon(Heroicon::Trash);
+        }
 
-		return $actions;
-	}
+        return $actions;
+    }
 }

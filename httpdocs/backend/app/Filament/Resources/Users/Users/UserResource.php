@@ -33,23 +33,23 @@ class UserResource extends Resource
 
     protected static string|null|UnitEnum $navigationGroup = AdminNavigationGroupEnum::Users;
 
-	public static function form(Schema $schema): Schema
-	{
-		return UserForm::configure($schema);
-	}
+    public static function form(Schema $schema): Schema
+    {
+        return UserForm::configure($schema);
+    }
 
-	public static function table(Table $table): Table
-	{
-		return UserTable::configure($table);
-	}
+    public static function table(Table $table): Table
+    {
+        return UserTable::configure($table);
+    }
 
     public static function getPages(): array
     {
         return [
-			'index' => ListUsers::route('/'),
-			'create' => CreateUser::route('/create'),
-			'edit' => EditUser::route('/{record}/edit')
-		];
+            'index' => ListUsers::route('/'),
+            'create' => CreateUser::route('/create'),
+            'edit' => EditUser::route('/{record}/edit'),
+        ];
     }
 
     /**

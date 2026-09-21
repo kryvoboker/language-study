@@ -24,15 +24,15 @@ class AiProviderSettingResource extends Resource
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCpuChip;
     protected static string|null|UnitEnum   $navigationGroup = AdminNavigationGroupEnum::AiProviders;
 
-	public static function form(Schema $schema): Schema
-	{
-		return AiProviderSettingForm::configure($schema);
-	}
+    public static function form(Schema $schema): Schema
+    {
+        return AiProviderSettingForm::configure($schema);
+    }
 
-	public static function table(Table $table): Table
-	{
-		return AiProviderSettingTable::configure($table);
-	}
+    public static function table(Table $table): Table
+    {
+        return AiProviderSettingTable::configure($table);
+    }
 
     public static function getPages(): array
     {

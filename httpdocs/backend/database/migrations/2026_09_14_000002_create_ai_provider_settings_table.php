@@ -16,7 +16,7 @@ return new class () extends Migration {
 
             $table->string('key')->unique();
             $table->string('name');
-			$table->longText('prompt_instruction')->nullable();
+            $table->longText('prompt_instruction')->nullable();
             $table->boolean('enabled')->default(false);
             $table->boolean('is_default')->default(false);
             $table->longText('configuration');
