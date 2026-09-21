@@ -1,6 +1,6 @@
 <script setup lang="ts">
 const {
-          sourceText, sourceLanguage, targetLanguage, current, isBusy, errorMessage, accessError, inputCharacterLimit, schedule, translate,
+          sourceText, sourceLanguage, targetLanguage, current, isBusy, errorMessage, accessError, inputCharacterLimit, schedule, swapLanguages, translate,
       }          = useTranslationWorkbench()
 const localePath = useLocalePath()
 
@@ -8,13 +8,6 @@ const languages = [
     { code: 'en', label: 'English' }, { code: 'uk', label: 'Ukrainian' }, { code: 'ru', label: 'Russian' },
     { code: 'de', label: 'German' }, { code: 'pl', label: 'Polish' }, { code: 'es', label: 'Spanish' }, { code: 'fr', label: 'French' },
 ]
-
-const swapLanguages = () => {
-    const source         = sourceLanguage.value
-    sourceLanguage.value = targetLanguage.value
-    targetLanguage.value = source
-    void schedule()
-}
 
 const copyTranslation = async () => {
     if (current.value?.translation) await navigator.clipboard.writeText(current.value.translation)

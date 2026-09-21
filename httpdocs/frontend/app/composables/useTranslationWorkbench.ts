@@ -151,6 +151,23 @@ export const useTranslationWorkbench = () => {
     debounceTimer = setTimeout(() => void translate(), 1000)
   }
 
+  const swapLanguages = async () => {
+    const translatedText = current.value?.translation
+
+    await cancelCurrent()
+
+    const previousSourceLanguage = sourceLanguage.value
+    sourceLanguage.value = targetLanguage.value
+    targetLanguage.value = previousSourceLanguage
+
+    if (translatedText) {
+      sourceText.value = translatedText
+      current.value = null
+    }
+
+    await schedule()
+  }
+
   return {
     sourceText,
     sourceLanguage,
@@ -161,6 +178,7 @@ export const useTranslationWorkbench = () => {
     accessError,
     inputCharacterLimit,
     schedule,
+    swapLanguages,
     cancelCurrent,
     translate,
   }

@@ -1,6 +1,8 @@
 FROM redis:8.8.2-alpine3.23
 
-RUN apk add --no-cache tzdata
+RUN apk add --no-cache \
+    tzdata \
+    shadow
 
 ENV TZ=Europe/Kyiv
 ENV HOME=/home/${USERNAME}
