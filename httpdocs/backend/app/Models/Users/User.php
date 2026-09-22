@@ -9,6 +9,7 @@ use Database\Factories\UserFactory;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Passport\Contracts\OAuthenticatable;
@@ -61,8 +62,8 @@ class User extends Authenticatable implements FilamentUser, OAuthenticatable
             && $this->can('access_admin_panel');
     }
 
-    /** @return \Illuminate\Database\Eloquent\Relations\BelongsTo<AiProviderSetting, $this> */
-    public function aiProvider(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    /** @return BelongsTo<AiProviderSetting, $this> */
+    public function aiProvider(): BelongsTo
     {
         return $this->belongsTo(AiProviderSetting::class, 'ai_provider_id');
     }

@@ -26,15 +26,16 @@ COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr
 RUN install-php-extensions \
     gd \
     zip \
-    mysqli \
     pdo \
-    pdo_mysql \
+    pdo_pgsql \
+    pgsql \
     xdebug \
     xhprof \
     sockets \
     intl \
     bcmath \
     pcntl \
+    redis \
   && rm -f /usr/local/bin/install-php-extensions
 
 RUN docker-php-ext-enable xdebug xhprof
@@ -97,14 +98,29 @@ RUN mkdir -p \
     ${NPM_CONFIG_PREFIX}/ \
     ${NPM_CONFIG_CACHE}/ \
     ${COMPOSER_CACHE_DIR}/ \
+    /var/log/supervisor/ \
+    /var/run/supervisor \
   && chown -R ${UID}:${GID} \
     ${COMPOSER_HOME}/ \
     ${NPM_CONFIG_PREFIX}/ \
     ${NPM_CONFIG_CACHE}/ \
+    /var/log/supervisor/ \
+    /var/run/supervisor \
   && chmod -R 755 \
     ${COMPOSER_HOME}/ \
     ${NPM_CONFIG_CACHE}/ \
-    ${NPM_CONFIG_PREFIX}/
+    ${NPM_CONFIG_PREFIX}/ \
+    /var/log/supervisor/ \
+  && touch  \
+    /var/run/supervisor/supervisord.pid \
+    /var/log/supervisor/supervisord.log \
+  && chmod 600 \
+     /var/run/supervisor/supervisord.pid \
+  && chmod 700 \
+    /var/run/supervisor/ \
+  && chown ${UID}:${GID} \
+     /var/run/supervisor/supervisord.pid \
+    /var/log/supervisor/supervisord.log
 
 # Rebuild the font cache after installing fonts
 RUN fc-cache -f -v

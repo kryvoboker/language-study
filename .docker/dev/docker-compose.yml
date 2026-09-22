@@ -18,7 +18,7 @@ services:
       - "host.docker.internal:host-gateway"
     env_file:
       - ../../.docker/dev/env/.env
-      - ../../.docker/dev/env/.env.mariadb
+      - ../../.docker/dev/env/.env.postgresql
     volumes:
       - ../../httpdocs/backend:/var/www/html
       - ../../storage:/var/www/storage
@@ -26,13 +26,16 @@ services:
       - ../../.docker/dev/php/php.ini:/usr/local/etc/php/php.ini:ro
       - ../../.docker/dev/php/supervisord.conf:/etc/supervisord.conf:ro
       - ../../.docker/dev/php/horizon.conf:/etc/supervisor/conf.d/horizon.conf:ro
+    init: true # Ensures proper signal handling and zombie reaping
     security_opt:
       - no-new-privileges:true       # Disables setuid/setgid
       - apparmor=docker-default      # Limits syscalls and file system
     cap_drop:
       - ALL # Removes Linux capabilities
     depends_on:
-      language-study-mariadb:
+      language-study-postgresql:
+        condition: service_healthy
+      language-study-redis:
         condition: service_healthy
     networks:
       - language-study-net
@@ -61,6 +64,7 @@ services:
       - ../../storage:/var/www/storage:ro
       - ../../.docker/dev/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ../../httpdocs/frontend/public/images/social:/var/www/qr-social:ro
+    init: true # Ensures proper signal handling and zombie reaping
     security_opt:
       - no-new-privileges:true       # Disables setuid/setgid
       - apparmor=docker-default      # Limits syscalls and file system
@@ -97,6 +101,7 @@ services:
     volumes:
       - ../../httpdocs/frontend:/var/www/html
       - ../../storage:/var/www/storage
+    init: true # Ensures proper signal handling and zombie reaping
     security_opt:
       - no-new-privileges:true       # Disables setuid/setgid
       - apparmor=docker-default      # Limits syscalls and file system
@@ -105,32 +110,32 @@ services:
     networks:
       - traefik-network
       - language-study-net
-  
-  language-study-mariadb:
+
+  language-study-postgresql:
     build:
       context: ${PWD}
-      dockerfile: .docker/dev/mariadb/Dockerfile
+      dockerfile: .docker/dev/postgresql/Dockerfile
       args:
         UID: ${UID:-1000}
         GID: ${GID:-1000}
         UMASK: ${UMASK:-0002}
-        USERNAME: mysql
-    image: language-study-mariadb:1.0
-    container_name: language-study-mariadb
+        USERNAME: postgres
+    image: language-study-postgresql:1.0-alpine
+    container_name: language-study-postgresql
     restart: unless-stopped
     healthcheck:
-      test: [ "CMD-SHELL", "mariadb-admin ping --protocol=tcp -h 127.0.0.1 -P 3306 -u$${MARIADB_USER} -p$${MARIADB_PASSWORD} --silent" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 30s
+      test: [ "CMD-SHELL", "pg_isready --username=$${POSTGRES_SIMPLE_USER} --dbname=$${POSTGRES_DB}" ]
+      interval: 3s
+      timeout: 3s
+      retries: 1
     ports:
-      - "3352:3306"
+      - "3352:5432"
     env_file:
       - ../../.docker/dev/env/.env
-      - ../../.docker/dev/env/.env.mariadb
+      - ../../.docker/dev/env/.env.postgresql
     volumes:
-      - ../../.db/mariadb:/var/lib/mysql
+      - ../../.db/postgresql:/var/lib/postgresql
+    init: true # Ensures proper signal handling and zombie reaping
     security_opt:
       - no-new-privileges:true       # Disables setuid/setgid
       - apparmor=docker-default      # Limits syscalls and file system
@@ -139,68 +144,35 @@ services:
     networks:
       - language-study-net
 
-#  language-study-postgresql:
-#    build:
-#      context: ${PWD}
-#      dockerfile: .docker/dev/postgresql/Dockerfile
-#      args:
-#        UID: ${UID:-1000}
-#        GID: ${GID:-1000}
-#        UMASK: ${UMASK:-0002}
-#        USERNAME: postgres
-#    image: language-study-postgresql:1.0-alpine
-#    container_name: language-study-postgresql
-#    restart: unless-stopped
-#    healthcheck:
-#      test: [ "CMD-SHELL", "pg_isready --username=$${POSTGRES_SIMPLE_USER} --dbname=$${POSTGRES_DB}" ]
-#      interval: 3s
-#      timeout: 3s
-#      retries: 1
-#    ports:
-#      - "3352:5432"
-#    env_file:
-#      - ../../.docker/dev/env/.env
-#      - ../../.docker/dev/env/.env.postgresql
-#    volumes:
-#      - ../../.db/postgresql:/var/lib/postgresql
-#    init: true # Ensures proper signal handling and zombie reaping
-#    security_opt:
-#      - no-new-privileges:true       # Disables setuid/setgid
-#      - apparmor=docker-default      # Limits syscalls and file system
-#    cap_drop:
-#      - ALL # Removes Linux capabilities
-#    networks:
-#      - language-study-net
-
-#  language-study-redis:
-#    build:
-#      context: ${PWD}
-#      dockerfile: .docker/dev/redis/Dockerfile
-#      args:
-#        UID: ${UID:-1000}
-#        GID: ${GID:-1000}
-#        UMASK: ${UMASK:-0002}
-#        USERNAME: redis
-#    image: language-study-redis:1.0-alpine
-#    container_name: language-study-redis
-#    restart: unless-stopped
-#    ports:
-#      - "42610:6379"
-#    healthcheck:
-#      test: [ "CMD", "redis-cli", "ping" ]
-#      interval: 5s
-#      timeout: 3s
-#      retries: 5
-#    volumes:
-#      - ../../.db/redis:/data
-#    init: true # Ensures proper signal handling and zombie reaping
-#    security_opt:
-#      - no-new-privileges:true
-#      - apparmor=docker-default
-#    cap_drop:
-#      - ALL # Removes Linux capabilities
-#    networks:
-#      - language-study-net
+  language-study-redis:
+    build:
+      context: ${PWD}
+      dockerfile: .docker/dev/redis/Dockerfile
+      args:
+        UID: ${UID:-1000}
+        GID: ${GID:-1000}
+        UMASK: ${UMASK:-0002}
+        USERNAME: redis
+    image: language-study-redis:1.0-alpine
+    container_name: language-study-redis
+    restart: unless-stopped
+    ports:
+      - "42610:6379"
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    volumes:
+      - ../../.db/redis:/data
+    init: true # Ensures proper signal handling and zombie reaping
+    security_opt:
+      - no-new-privileges:true
+      - apparmor=docker-default
+    cap_drop:
+      - ALL # Removes Linux capabilities
+    networks:
+      - language-study-net
 
 networks:
   traefik-network:

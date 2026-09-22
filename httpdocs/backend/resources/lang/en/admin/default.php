@@ -3,68 +3,69 @@
 declare(strict_types=1);
 
 return [
-    // Menu items
-    'menu' => [
-        'item_users' => 'Users',
-        'item_ai_providers' => 'AI Providers',
-    ],
+	// Menu items
+	'menu'    => [
+		'item_users'        => 'Users',
+		'item_ai_providers' => 'AI Providers',
+	],
 
-    // Texts
-    'texts' => [
-    ],
+	// Texts
+	'texts'   => [
+	],
 
-    // Columns
-    'columns' => [
-    ],
+	// Columns
+	'columns' => [
+	],
 
-    // Labels
-    'labels' => [
-    ],
+	// Labels
+	'labels'  => [
+	],
 
-    // Buttons
-    'buttons' => [
-        'save' => 'Save',
-        'create' => 'Create',
-        'back' => 'Back',
-        'edit' => 'Edit',
-        'update' => 'Update',
-        'delete' => 'Delete',
-        'cancel' => 'Cancel',
-    ],
+	// Buttons
+	'buttons' => [
+		'save'   => 'Save',
+		'create' => 'Create',
+		'back'   => 'Back',
+		'edit'   => 'Edit',
+		'update' => 'Update',
+		'delete' => 'Delete',
+		'cancel' => 'Cancel',
+	],
 
-    'actions' => [
-        'add' => 'Add',
-    ],
+	'actions'      => [
+		'add'          => 'Add',
+		'open_website' => 'Open on the website',
+	],
 
-    // Helpers
-    'helpers' => [
-    ],
+	// Helpers
+	'helpers'      => [
+	],
 
-    // Tabs
-    'tabs' => [
-        'general' => 'General',
-    ],
+	// Tabs
+	'tabs'         => [
+		'general' => 'General',
+	],
 
-    // Sections
-    'sections' => [
-    ],
+	// Sections
+	'sections'     => [
+	],
 
-    // Filters
-    'filters' => [
-    ],
+	// Filters
+	'filters'      => [
+	],
 
-    // Placeholders
-    'placeholders' => [
-        'all' => 'All',
-        'all_users' => 'All Users',
-    ],
+	// Placeholders
+	'placeholders' => [
+		'all'       => 'All',
+		'all_users' => 'All Users',
+	],
 
-    // Success
-    'success' => [
-        'title' => 'Success',
-    ],
+	// Success
+	'success'      => [
+		'title' => 'Success',
+	],
 
-    // Errors
-    'errors' => [
-    ],
+	// Errors
+	'errors'       => [
+	],
 ];

@@ -23,9 +23,6 @@ return new class () extends Migration {
 
             $table->timestamps();
         });
-        Schema::table('users', function (Blueprint $table): void {
-            $table->foreign('ai_provider_id')->references('id')->on('ai_provider_settings')->nullOnDelete();
-        });
     }
 
     public function down(): void
